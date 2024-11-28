@@ -9,9 +9,8 @@ local utils = require("doing.utils")
 function Core.setup(opts)
   state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
   state.tasks = state.init(state.options.store)
-  local winbar_options = state.options.winbar
 
-  Core.setup_winbar(winbar_options)
+  Core.setup_winbar()
 
   return Core
 end
@@ -63,18 +62,18 @@ end
 
 --- toggle the visibility of the plugin
 function Core.toggle_display()
-  -- disable winbar completely when not visible
-  vim.wo.winbar = vim.wo.winbar == "" and view.stl or ""
-
   state.view_enabled = not state.view_enabled
-  state.options.winbar.enabled = not state.options.winbar.enabled
 
-  Core.redraw_winbar()
+  if state.options.winbar.enabled then
+    -- disable winbar completely when not visible
+    vim.wo.winbar = vim.wo.winbar == "" and view.stl or ""
+    Core.redraw_winbar()
+  end
 end
 
 ---configure displaying current to do item in winbar
-function Core.setup_winbar(options)
-  if not options then
+function Core.setup_winbar()
+  if not state.options.winbar.enabled then
     return
   end
 

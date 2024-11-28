@@ -11,9 +11,6 @@ end, { nargs = '?', bang = true })
 create("Done", core.done, {})
 
 create("DoToggle", core.toggle_winbar, {})
-create("DoHide", core.disable_winbar, {})
-create("DoShow", core.enable_winbar, {})
 create("DoEdit", core.edit, {})
-create("DoSave", core.save, { bang = true })
 
 return core

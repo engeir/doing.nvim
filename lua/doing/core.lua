@@ -100,27 +100,6 @@ function Core.setup_winbar(options)
     end,
   })
 end
-
-function Core.disable_winbar()
-  if not state.auGroupID then
-    return -- already disabled
-  end
-
-  for _, _ in ipairs(vim.api.nvim_list_wins()) do
-    if vim.fn.win_gettype() == "" then
-      vim.api.nvim_set_option_value("winbar", nil, {})
-    end
-  end
-
-  vim.api.nvim_del_augroup_by_id(state.auGroupID)
-  Core.hide()
-end
-
-function Core.enable_winbar()
-  Core.setup_winbar(state.options.winbar)
-  Core.redraw_winbar()
-end
-
 --- toggle the visibility of the winbar
 function Core.toggle_winbar()
   -- disable winbar completely when not visible

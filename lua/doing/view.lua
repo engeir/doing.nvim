@@ -19,7 +19,6 @@ function View.render()
     return ""
   end
 
-  state.tasks = store.init(state.options.store)
   local right = ""
 
   -- using pcall so that it won't spam error messages

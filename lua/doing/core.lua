@@ -1,9 +1,8 @@
 local Core = {}
+
 local view = require("doing.view")
 local edit = require("doing.edit")
-local store = require("doing.store")
-local state = require("doing.state").state
-local default_opts = require("doing.state").default_opts
+local state = require("doing.state")
 local utils = require("doing.utils")
 
 ---Show a message for the duration of `options.message_timeout`
@@ -14,14 +13,12 @@ function Core.show_message(str)
   vim.defer_fn(function()
     state.message = nil
     Core.redraw_winbar()
-  end, default_opts.message_timeout)
+  end, state.default_opts.message_timeout)
 
   Core.redraw_winbar()
 end
 
 ---add a task to the list
----@param task string the task to be added, if empty, asks user for input
----@param to_front boolean whether to add task to front of list
 function Core.add(task, to_front)
   state.tasks:sync(true)
   if task == nil then
@@ -64,10 +61,9 @@ function Core.edit()
 end
 
 ---Setup doing.nvim
----@param opts DoOptions
 function Core.setup(opts)
-  state.options = vim.tbl_deep_extend("force", default_opts, opts or {})
-  state.tasks = store.init(state.options.store)
+  state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
+  state.tasks = state.init(state.options.store)
   local winbar_options = state.options.winbar
 
   Core.setup_winbar(winbar_options)
@@ -76,7 +72,6 @@ function Core.setup(opts)
 end
 
 ---configure displaying current to do item in winbar
----@param options WinbarOptions
 function Core.setup_winbar(options)
   if not options then
     return

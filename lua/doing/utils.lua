@@ -1,8 +1,9 @@
-local M = {}
-local state = require('doing.state').state
+local Utils = {}
+
+local state = require('doing.state')
 
 --- execute the auto command when a task is modified
-function M.exec_task_modified_autocmd()
+function Utils.exec_task_modified_autocmd()
   vim.api.nvim_exec_autocmds("User", {
     pattern = "TaskModified",
     group = state.auGroupID,
@@ -10,7 +11,7 @@ function M.exec_task_modified_autocmd()
 end
 
 ---Check whether the current window/buffer can display a winbar
-function M.should_display_task()
+function Utils.should_display_task()
   if vim.api.nvim_buf_get_name(0) == "" or
       vim.fn.win_gettype() == "preview" then
     return false
@@ -26,4 +27,4 @@ function M.should_display_task()
       and vim.bo.buftype ~= "prompt"
 end
 
-return M
+return Utils

@@ -1,11 +1,9 @@
-local state = require("doing.state").state
-local store = require("doing.store")
+local state = require("doing.state")
 local utils = require("doing.utils")
 
 local View = {}
 
 ---Create a winbar string for the current task
----@return string|table
 function View.render()
   if (not state.view_enabled) or
       (not utils.should_display_task())
@@ -13,7 +11,6 @@ function View.render()
     return ""
   end
 
-  state.tasks = store.init(state.options.store)
   local right = ""
 
   -- using pcall so that it won't spam error messages

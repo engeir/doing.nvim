@@ -1,5 +1,3 @@
-local utils = require("doing.utils")
--- print("core:", vim.inspect(core)) -- __AUTO_GENERATED_PRINT_VAR__
 local global_win = nil
 local global_buf = nil
 local state = require("doing.state")
@@ -35,7 +33,7 @@ local function get_buf_tasks()
   local indices = {}
 
   for _, line in pairs(lines) do
-    if not utils.is_white_space(line) then
+    if not (line:gsub("%s", "") == "") then
       table.insert(indices, line)
     end
   end

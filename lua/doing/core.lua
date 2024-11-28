@@ -63,11 +63,6 @@ function Core.edit()
   Core.redraw_winbar()
 end
 
---- save the tasks
-function Core.save()
-  state.tasks:sync(true)
-end
-
 ---Setup doing.nvim
 ---@param opts DoOptions
 function Core.setup(opts)
@@ -100,6 +95,7 @@ function Core.setup_winbar(options)
     end,
   })
 end
+
 --- toggle the visibility of the winbar
 function Core.toggle_winbar()
   -- disable winbar completely when not visible
@@ -111,10 +107,6 @@ function Core.toggle_winbar()
   Core.redraw_winbar()
 end
 
-function Core.view()
-  return view.render()
-end
-
 function Core.hide()
   vim.wo.winbar = ""
 
@@ -124,7 +116,6 @@ end
 
 --- Redraw winbar depending on if there are tasks. Redraw if there are pending tasks, other wise set to ""
 function Core.redraw_winbar()
-
   if utils.should_display_task() and
       state.options.winbar.enabled
   then

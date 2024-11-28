@@ -1,10 +1,6 @@
 local M = {}
 local state = require('doing.state').state
 
-function M.is_white_space(str)
-  return str:gsub("%s", "") == ""
-end
-
 --- execute the auto command when a task is modified
 function M.exec_task_modified_autocmd()
   vim.api.nvim_exec_autocmds("User", {

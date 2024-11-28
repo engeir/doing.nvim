@@ -4,12 +4,6 @@ local utils = require("doing.utils")
 
 local View = {}
 
---- Weather the winbar should visible, when view_enabled is true, and there are items in the list
----@return boolean
-function View.is_visible()
-  return state.view_enabled and state.tasks:has_items() or not not state.message
-end
-
 ---Create a winbar string for the current task
 ---@return string|table
 function View.render()

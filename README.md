@@ -24,7 +24,6 @@ And it uses a simple, intuitive floating buffer to manage that list.
 -  `:Do!` add a task to the front of list.
 -  `:Done` remove the first task from the list.
 -  `:DoEdit` edit the tasklist in a floating window.
--  `:DoSave` create `.tasks` file in cwd. Will auto-sync afterwards.
 -  `:DoToggle` toggle the display. Use with caution!
 
 ## Installation

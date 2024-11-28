@@ -1,8 +1,9 @@
 -- A tinier task manager that helps you stay on track.
 local create = vim.api.nvim_create_user_command
-local core = require('doing.core')
+local core = require("doing.core")
+local view = require("doing.view")
 
-_G.DoStatusline = core.view
+_G.DoStatusline = view.render
 
 create("Do", function(args)
   core.add(unpack(args.fargs), args.bang)

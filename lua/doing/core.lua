@@ -149,7 +149,7 @@ function Core.redraw_winbar()
   if utils.should_display_task() and
       state.options.winbar.enabled
   then
-    if state.tasks:has_items() or Core.has_message() then
+    if state.tasks:has_items() or state.message then
       vim.wo.winbar = view.stl
     else
       Core.hide()

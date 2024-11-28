@@ -10,7 +10,7 @@ State.default_opts = {
   },
 
   store = {
-    auto_create_file = true,
+    auto_create_file = false,
     file_name = ".tasks"
   }
 }

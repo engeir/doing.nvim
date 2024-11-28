@@ -2,9 +2,9 @@
 
 A tiny task manager within nvim that helps you stay on track.
 
-this plugin is a fork of [do.nvim](https://github.com/nocksock/do.nvim)
+this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocksock/do.nvim)
 
-![doing](https://raw.githubusercontent.com/Hashino/doing.nvim/main/demo/demo.gif)
+![doing](https://raw.githubusercontent.com/Hashino/doing.nvim/main/demo.gif)
 
 ## Rationale
 
@@ -20,16 +20,13 @@ And it uses a simple, intuitive floating buffer to manage that list.
 
 ## Usage
 
--  `:Do` add a task to the end of the list.
--  `:Do!` add a task to the front of list.
--  `:Done` remove the first task from the list.
--  `:DoEdit` edit the tasklist in a floating window.
--  `:DoSave` create `.tasks` file in cwd. Will auto-sync afterwards.
--  `:DoToggle` toggle the display. Use with caution!
+-  `:Do` add a task to the end of the list
+-  `:Do!` add a task to the front of list
+-  `:Done` remove the first task from the list
+-  `:DoEdit` edit the tasklist in a floating window
+-  `:DoToggle` toggle the display
 
 ## Installation
-
- Requires Neovim 0.8.
 
 lazy.nvim:
 
@@ -46,9 +43,9 @@ return {
 ``` lua
 -- example configuration
 return {
-  'hashino/do.nvim',
+  'hashino/doing.nvim',
   config = function()
-    require('do').setup {
+    require('doing').setup {
       -- default options
       message_timeout = 2000,
       winbar = { 
@@ -77,8 +74,9 @@ return {
 
 ### Lualine
 
-In case you'd rather use it in the statusline or tabbar, you can use the exposed
-views to do so. For example with lualine:
+In case you'd rather use it with another plugin instead of the default winbar
+implementation, you can use the exposed views to do so. 
+For example with lualine:
 
 ```lua
 require('lualine').setup {
@@ -94,7 +92,7 @@ This plugin exposes a custom event, for when a task is added or modified. You ca
 
 ```lua
 vim.api.nvim_create_autocmd({ "User" }, {
-   group = require("do.state").state.auGroupID,
+   group = require("doing.state").auGroupID,
    pattern = "TaskModified",
    desc = "This is called when a task is added or deleted",
    callback = function()

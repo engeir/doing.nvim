@@ -1,18 +1,10 @@
-local state = require("doing.state").state
-local store = require("doing.store")
+local state = require("doing.state")
 local utils = require("doing.utils")
 
 local View = {}
 
---- Weather the winbar should visible, when view_enabled is true, and there are items in the list
----@return boolean
-function View.is_visible()
-  return state.view_enabled and state.tasks:has_items() or not not state.message
-end
-
 ---Create a winbar string for the current task
----@return string|table
-function View.render()
+function View.status()
   if (not state.view_enabled) or
       (not utils.should_display_task())
   then
@@ -56,7 +48,6 @@ function View.render()
   return left .. '  ' .. right
 end
 
-View.stl = "%!v:lua.DoStatusline('active')"
-View.stl_nc = "%!v:lua.DoStatusline('inactive')"
+View.stl = "%!v:lua.DoingStatusline('active')"
 
 return View

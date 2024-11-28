@@ -1,9 +1,9 @@
-local utils = require("doing.utils")
--- print("core:", vim.inspect(core)) -- __AUTO_GENERATED_PRINT_VAR__
+local Edit = {}
+
+local state = require("doing.state")
+
 local global_win = nil
 local global_buf = nil
-local state = require("doing.state")
-local M = {}
 
 local function open_float()
   local bufnr = vim.api.nvim_create_buf(false, false)
@@ -19,23 +19,21 @@ local function open_float()
     height = height
   })
 
-  -- vim.api.nvim_win_set_option(win, "winhl", "Normal:NormalFloat")
   vim.api.nvim_set_option_value("winhl", "Normal:NormalFloat", {})
 
   return {
     buf = bufnr,
     win = win
   }
-end --
+end
 
 --- Get all the tasks currently in the pop up window
----@return string[]
 local function get_buf_tasks()
   local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
   local indices = {}
 
   for _, line in pairs(lines) do
-    if not utils.is_white_space(line) then
+    if not (line:gsub("%s", "") == "") then
       table.insert(indices, line)
     end
   end
@@ -43,19 +41,9 @@ local function get_buf_tasks()
   return indices
 end
 
-function M.close(cb)
-  if cb then
-    cb(get_buf_tasks())
-  end
-
-  vim.api.nvim_win_close(0, true)
-  global_win = nil
-  global_buf = nil
-end
-
-function M.toggle_edit(tasks, cb)
+function Edit.toggle_edit(tasks, cb)
   if global_win ~= nil and vim.api.nvim_win_is_valid(global_win) then
-    M.close()
+    Edit.close()
     return
   end
 
@@ -72,24 +60,25 @@ function M.toggle_edit(tasks, cb)
   vim.api.nvim_buf_set_lines(global_buf, 0, #tasks, false, tasks)
 
   vim.keymap.set("n", "q", function()
-    M.close(cb)
+    Edit.close(cb)
   end, { buffer = global_buf })
+
   vim.keymap.set("n", "<Esc>", function()
-    M.close(cb)
+    Edit.close(cb)
   end, { buffer = global_buf })
 
   -- event after tasks from pop up has been written to
   vim.api.nvim_create_autocmd("BufWriteCmd", {
-    group = state.state.auGroupID,
+    group = state.auGroupID,
     buffer = global_buf,
     callback = function()
       local new_todos = get_buf_tasks()
-      state.state.tasks:set(new_todos)
+      state.tasks:set(new_todos)
     end
   })
 
   vim.api.nvim_create_autocmd("BufModifiedSet", {
-    group = state.state.auGroupID,
+    group = state.auGroupID,
     buffer = global_buf,
     callback = function()
       vim.api.nvim_set_option_value("modified", false, {})
@@ -97,4 +86,14 @@ function M.toggle_edit(tasks, cb)
   })
 end
 
-return M
+function Edit.close(cb)
+  if cb then
+    cb(get_buf_tasks())
+  end
+
+  vim.api.nvim_win_close(0, true)
+  global_win = nil
+  global_buf = nil
+end
+
+return Edit

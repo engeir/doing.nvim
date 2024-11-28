@@ -1,27 +1,22 @@
 local Core = {}
+
 local view = require("doing.view")
 local edit = require("doing.edit")
-local store = require("doing.store")
-local state = require("doing.state").state
-local default_opts = require("doing.state").default_opts
+local state = require("doing.state")
 local utils = require("doing.utils")
 
----Show a message for the duration of `options.message_timeout`
----@param str string Text to display
-function Core.show_message(str)
-  state.message = str
+---Setup doing.nvim
+function Core.setup(opts)
+  state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
+  state.tasks = state.init(state.options.store)
+  local winbar_options = state.options.winbar
 
-  vim.defer_fn(function()
-    state.message = nil
-    Core.redraw_winbar()
-  end, default_opts.message_timeout)
+  Core.setup_winbar(winbar_options)
 
-  Core.redraw_winbar()
+  return Core
 end
 
 ---add a task to the list
----@param task string the task to be added, if empty, asks user for input
----@param to_front boolean whether to add task to front of list
 function Core.add(task, to_front)
   state.tasks:sync(true)
   if task == nil then
@@ -32,10 +27,23 @@ function Core.add(task, to_front)
     end)
   else
     state.tasks:add(task, to_front)
+    if state.options.winbar then
+      Core.redraw_winbar()
+    end
   end
 end
 
---- Finish the first task
+--- Edit the tasks in a floating window
+function Core.edit()
+  edit.toggle_edit(state.tasks:get(), function(new_todos)
+    state.tasks:set(new_todos)
+    utils.exec_task_modified_autocmd()
+  end)
+  state.tasks:sync(true)
+  Core.redraw_winbar()
+end
+
+--- Finish the current task
 function Core.done()
   if not state.tasks:has_items() then
     Core.show_message(" There was nothing left to do ")
@@ -53,41 +61,26 @@ function Core.done()
   utils.exec_task_modified_autocmd()
 end
 
---- Edit the tasks in a floating window
-function Core.edit()
-  edit.toggle_edit(state.tasks:get(), function(new_todos)
-    state.tasks:set(new_todos)
-    utils.exec_task_modified_autocmd()
-  end)
-  state.tasks:sync(true)
+--- toggle the visibility of the plugin
+function Core.toggle_display()
+  -- disable winbar completely when not visible
+  vim.wo.winbar = vim.wo.winbar == "" and view.stl or ""
+
+  state.view_enabled = not state.view_enabled
+  state.options.winbar.enabled = not state.options.winbar.enabled
+
   Core.redraw_winbar()
 end
 
---- save the tasks
-function Core.save()
-  state.tasks:sync(true)
-end
-
----Setup doing.nvim
----@param opts DoOptions
-function Core.setup(opts)
-  state.options = vim.tbl_deep_extend("force", default_opts, opts or {})
-  state.tasks = store.init(state.options.store)
-  local winbar_options = state.options.winbar
-
-  Core.setup_winbar(winbar_options)
-
-  return Core
-end
-
 ---configure displaying current to do item in winbar
----@param options WinbarOptions
 function Core.setup_winbar(options)
   if not options then
     return
   end
 
-  vim.g.winbar = view.stl_nc
+  _G.DoingStatusline = view.status
+
+  vim.g.winbar = view.stl
   vim.api.nvim_set_option_value("winbar", view.stl, {})
 
   state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true })
@@ -100,22 +93,8 @@ function Core.setup_winbar(options)
     end,
   })
 end
---- toggle the visibility of the winbar
-function Core.toggle_winbar()
-  -- disable winbar completely when not visible
-  vim.wo.winbar = vim.wo.winbar == "" and view.stl or ""
 
-  state.view_enabled = not state.view_enabled
-  state.options.winbar.enabled = not state.options.winbar.enabled
-
-  Core.redraw_winbar()
-end
-
-function Core.view()
-  return view.render()
-end
-
-function Core.hide()
+function Core.hide_winbar()
   vim.wo.winbar = ""
 
   vim.cmd([[ set winbar= ]])
@@ -124,18 +103,30 @@ end
 
 --- Redraw winbar depending on if there are tasks. Redraw if there are pending tasks, other wise set to ""
 function Core.redraw_winbar()
-
   if utils.should_display_task() and
       state.options.winbar.enabled
   then
     if state.tasks:has_items() or state.message then
       vim.wo.winbar = view.stl
     else
-      Core.hide()
+      Core.hide_winbar()
     end
   else
-    Core.hide()
+    Core.hide_winbar()
   end
+end
+
+---Show a message for the duration of `options.message_timeout`
+---@param str string Text to display
+function Core.show_message(str)
+  state.message = str
+
+  vim.defer_fn(function()
+    state.message = nil
+    Core.redraw_winbar()
+  end, state.default_opts.message_timeout)
+
+  Core.redraw_winbar()
 end
 
 return Core

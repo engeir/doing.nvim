@@ -16,7 +16,7 @@ end
 ---@param to_front boolean whether to add task to front of list
 function Api.add(str, to_front)
   state.tasks:add(str, to_front)
-  if state.options.winbar then
+  if state.options.winbar.enabled then
     core.redraw_winbar()
   end
   utils.exec_task_modified_autocmd()

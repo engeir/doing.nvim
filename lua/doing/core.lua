@@ -27,7 +27,7 @@ function Core.add(task, to_front)
     end)
   else
     state.tasks:add(task, to_front)
-    if state.options.winbar then
+    if state.options.winbar.enabled then
       Core.redraw_winbar()
     end
   end

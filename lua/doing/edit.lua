@@ -1,11 +1,26 @@
-local Edit = {}
-
 local state = require("doing.state")
 
 local global_win = nil
 local global_buf = nil
 
-local function open_float()
+local Edit = {}
+
+--- Get all the tasks currently in the pop up window
+local function get_buf_tasks()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
+  local indices = {}
+
+  for _, line in pairs(lines) do
+    if not (line:gsub("%s", "") == "") then
+      table.insert(indices, line)
+    end
+  end
+
+  return indices
+end
+
+-- creates window
+local function get_floating_window()
   local bufnr = vim.api.nvim_create_buf(false, false)
   local width = math.min(vim.opt.columns:get(), 80)
   local height = math.min(vim.opt.lines:get(), 12)
@@ -27,27 +42,25 @@ local function open_float()
   }
 end
 
---- Get all the tasks currently in the pop up window
-local function get_buf_tasks()
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-  local indices = {}
-
-  for _, line in pairs(lines) do
-    if not (line:gsub("%s", "") == "") then
-      table.insert(indices, line)
-    end
+-- closes the window
+local function close_edit(callback)
+  if callback then
+    callback(get_buf_tasks())
   end
 
-  return indices
+  vim.api.nvim_win_close(0, true)
+  global_win = nil
+  global_buf = nil
 end
 
-function Edit.toggle_edit(tasks, cb)
+-- opens a float window to manage tasks
+function Edit.open_edit(tasks, callback)
   if global_win ~= nil and vim.api.nvim_win_is_valid(global_win) then
-    Edit.close()
+    close_edit()
     return
   end
 
-  local win_info = open_float()
+  local win_info = get_floating_window()
   global_win = win_info.win
   global_buf = win_info.buf
 
@@ -60,11 +73,11 @@ function Edit.toggle_edit(tasks, cb)
   vim.api.nvim_buf_set_lines(global_buf, 0, #tasks, false, tasks)
 
   vim.keymap.set("n", "q", function()
-    Edit.close(cb)
+    close_edit(callback)
   end, { buffer = global_buf })
 
   vim.keymap.set("n", "<Esc>", function()
-    Edit.close(cb)
+    close_edit(callback)
   end, { buffer = global_buf })
 
   -- event after tasks from pop up has been written to
@@ -84,16 +97,6 @@ function Edit.toggle_edit(tasks, cb)
       vim.api.nvim_set_option_value("modified", false, {})
     end
   })
-end
-
-function Edit.close(cb)
-  if cb then
-    cb(get_buf_tasks())
-  end
-
-  vim.api.nvim_win_close(0, true)
-  global_win = nil
-  global_buf = nil
 end
 
 return Edit

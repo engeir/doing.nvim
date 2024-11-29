@@ -69,13 +69,13 @@ function State:import_file()
   local file = vim.fn.findfile(vim.loop.cwd() ..
     "/" .. State.options.store.file_name, ".;")
 
-  if file ~= "" then
+  if file == "" then
+    self.file = nil
+  else
     local is_readable = vim.fn.filereadable(file) == 1
     assert(is_readable, string.format("file not %s readable", file))
 
     self.file = file
-  else
-    self.file = nil
   end
 
   return self.file and vim.fn.readfile(self.file) or nil

@@ -77,7 +77,9 @@ function Core.setup_winbar()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinLeave", "BufEnter", "BufLeave" }, {
       group = state.auGroupID,
       callback = function()
-        Core.redraw_winbar_if_needed()
+        if state.view_enabled then
+          Core.redraw_winbar_if_needed()
+        end
       end,
     })
   end
@@ -86,7 +88,10 @@ end
 ---redraw winbar depending on if there are tasks. Redraw if there are pending tasks, other wise set to ""
 function Core.redraw_winbar_if_needed()
   if state.options.winbar.enabled then
-    if (state.tasks:count() > 0 or state.message) and Core.should_display() then
+    if state.view_enabled
+        and (state.tasks:count() > 0 or state.message)
+        and Core.should_display()
+    then
       vim.wo.winbar = view.stl
     else
       vim.wo.winbar = ""
@@ -113,16 +118,16 @@ function Core.should_display()
   local home_path_abs = tostring(os.getenv("HOME"))
 
   for _, exclude in ipairs(ignore) do
-    if string.find(vim.bo.filetype, exclude) or
-        exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") or
-        exclude == vim.fn.expand("%")
+    if string.find(vim.bo.filetype, exclude)                        -- match filetype
+        or exclude == vim.fn.expand("%")                            -- match filename
+        or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
     then
       return false
     end
   end
 
-  return vim.fn.win_gettype() == "" -- normal window
-      and vim.bo.buftype ~= "prompt"
+  return vim.fn.win_gettype() == ""        -- is a normal window
+      and not (vim.bo.buftype == "prompt") -- and not a prompt buffer
 end
 
 ---show a message for the duration of `options.message_timeout`

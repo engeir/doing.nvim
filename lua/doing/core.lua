@@ -6,7 +6,7 @@ local state = require("doing.state")
 local utils = require("doing.utils")
 
 ---Setup doing.nvim
----@param opts Options
+---@param opts DoingOptions
 function Core.setup(opts)
   state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
   state.tasks = state.init(state.options.store)

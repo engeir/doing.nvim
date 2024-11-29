@@ -17,13 +17,21 @@ function Utils.should_display_task()
     return false
   end
 
-  for _, exclude in ipairs(state.options.winbar.ignored_buffers) do
-    if string.find(vim.bo.filetype, exclude) then
+  local ignore = state.options.winbar.ignored_buffers
+
+  if type(ignore) == "function" then
+    ignore = ignore()
+  end
+
+  for _, exclude in ipairs(ignore) do
+    if string.find(vim.bo.filetype, exclude) or
+        vim.fn.expand("%") == exclude
+    then
       return false
     end
   end
 
-  return vim.fn.win_gettype() == ""
+  return vim.fn.win_gettype() == "" -- normal window
       and vim.bo.buftype ~= "prompt"
 end
 

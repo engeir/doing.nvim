@@ -23,9 +23,12 @@ function Utils.should_display_task()
     ignore = ignore()
   end
 
+  local home_path_abs = tostring(os.getenv("HOME"))
+
   for _, exclude in ipairs(ignore) do
     if string.find(vim.bo.filetype, exclude) or
-        vim.fn.expand("%") == exclude
+        exclude:gsub("~", home_path_abs ) == vim.fn.expand("%:p") or
+        exclude == vim.fn.expand("%")
     then
       return false
     end

@@ -11,41 +11,39 @@ function View.status()
     return ""
   end
 
-  local right = ""
+  local tasks_left = ""
 
   -- using pcall so that it won't spam error messages
-  local ok, left = pcall(function()
-    local count = state.tasks:count()
-    local res = ""
-    local current = state.tasks:current()
-
+  local ok, current_string = pcall(function()
     if state.message then
       return state.message
     end
+
+    local count = state.tasks:count()
 
     if count == 0 then
       return ""
     end
 
-    res = state.options.doing_prefix .. current
+    local res = state.options.doing_prefix .. state.tasks:current()
 
     -- append task count number if there is more than 1 task
     if count > 1 then
-      right = '+' .. (count - 1) .. " more"
+      tasks_left = '+' .. (count - 1) .. " more"
     end
 
     return res
   end)
 
   if not ok then
-    return "ERR: " .. left
+    return "ERR: " .. current_string
   end
 
-  if not right then
-    return left
+  if not tasks_left then
+    return current_string
   end
 
-  return left .. '  ' .. right
+  return current_string .. '  ' .. tasks_left
 end
 
 View.stl = "%!v:lua.DoingStatusline('active')"

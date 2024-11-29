@@ -1,12 +1,11 @@
 local state = require("doing.state")
-local utils = require("doing.utils")
 
 local View = {}
 
 ---Create a winbar string for the current task
 function View.status()
   if (not state.view_enabled) or
-      (not utils.should_display_task())
+      (not require("doing.core").should_display())
   then
     return ""
   end

@@ -1,12 +1,14 @@
+---@class State
 local State = {}
 
----@class Options
+---@class DoingOptions
 ---@field ignored_buffers string[]|fun():string[] elements of the array are checked against buffer filename/filetype
 ---@field message_timeout integer how many millisecons messages will stay on screen
 ---@field doing_prefix string prefix to show before the task
 ---@field winbar.enabled boolean if plugin should manage the winbar
 ---@field store.file_name string name of the task file
 ---@field store.auto_create_file boolean if true, creates task file on opening directory
+
 State.default_opts = {
   message_timeout = 2000,
   doing_prefix = "Doing: ",
@@ -49,43 +51,40 @@ State.init = function(options)
   return instance:set(instance:import_file() or {})
 end
 
+-- creates a file based on configs
 function State:create_file()
   local name = State.options.store.file_name
   local cwd = vim.loop.cwd()
   local file = io.open(cwd .. "/" .. name, "w")
   assert(file, "couldn't create " .. name .. " in current cwd: " .. cwd)
+
   file:write("")
   file:close()
+
   return name
 end
 
-function State:find_file(force)
-  local options = State.options
-  local file = vim.fn.findfile(vim.loop.cwd() .. "/" .. options.store.file_name, ".;")
-
-  if file == "" and force then
-    file = self:create_file()
-  end
-
-  if file == "" then
-    return nil
-  end
-
-  local is_readable = vim.fn.filereadable(file) == 1
-  assert(is_readable, string.format("file not %s readable", file))
-
-  return file
-end
-
+-- finds tasks file in cwd
 function State:import_file()
-  self.file = self:find_file()
+  local file = vim.fn.findfile(vim.loop.cwd() ..
+    "/" .. State.options.store.file_name, ".;")
+
+  if file ~= "" then
+    local is_readable = vim.fn.filereadable(file) == 1
+    assert(is_readable, string.format("file not %s readable", file))
+
+    self.file = file
+  else
+    self.file = nil
+  end
+
   return self.file and vim.fn.readfile(self.file) or nil
 end
 
+-- syncs file tasks with loaded tasks. creates file if force == true
 function State:sync(force)
   if not self.file and (State.options.store.auto_create_file or force) then
     self.file = self:create_file()
-    assert(self.file, "file not set despite saving")
   elseif not self.file then
     return self
   end
@@ -113,7 +112,7 @@ function State:set(tasks)
 end
 
 function State:count()
-  return #self:get()
+  return #self.tasks
 end
 
 function State:add(str, to_front)
@@ -126,12 +125,8 @@ function State:add(str, to_front)
   return self:sync()
 end
 
-function State:shift()
+function State:pop()
   return table.remove(self.tasks, 1), self:sync()
-end
-
-function State:has_items()
-  return self:count() > 0
 end
 
 return State

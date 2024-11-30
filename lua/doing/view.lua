@@ -43,6 +43,4 @@ function View.status()
   end
 end
 
-View.stl = "%!v:lua.DoingStatusline('active')"
-
 return View

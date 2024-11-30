@@ -11,7 +11,7 @@ local function get_buf_tasks()
   local indices = {}
 
   for _, line in pairs(lines) do
-    if not (line:gsub("%s", "") == "") then
+    if line:gsub("%s", "") ~= "" then
       table.insert(indices, line)
     end
   end

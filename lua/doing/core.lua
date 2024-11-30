@@ -68,13 +68,13 @@ function Core.setup_winbar()
   if state.options.winbar.enabled then
     _G.DoingStatusline = view.status
 
-    vim.g.winbar = view.stl
-    vim.api.nvim_set_option_value("winbar", view.stl, {})
+    vim.g.winbar = Core.stl
+    vim.api.nvim_set_option_value("winbar", Core.stl, {})
 
     state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true })
 
     -- winbar should not be displayed in windows the cursor is not in
-    vim.api.nvim_create_autocmd({ "WinEnter", "WinLeave", "BufEnter", "BufLeave" }, {
+    vim.api.nvim_create_autocmd({ "BufEnter" }, {
       group = state.auGroupID,
       callback = function()
         if state.view_enabled then
@@ -85,15 +85,16 @@ function Core.setup_winbar()
   end
 end
 
----redraw winbar depending on if there are tasks. Redraw if there are pending tasks, other wise set to ""
+---redraw winbar depending on if there are tasks.
+---redraw if there are pending tasks, otherwise set to ""
 function Core.redraw_winbar_if_needed()
-  if state.options.winbar.enabled then
-    if state.view_enabled
-        and (state.tasks:count() > 0 or state.message)
-        and Core.should_display()
+  if state.options.winbar.enabled then                 -- winbar enabled
+    if state.view_enabled                              -- display is enabled
+        and (state.tasks:count() > 0 or state.message) -- theres tasks/messages to show
+        and Core.should_display()                      -- is a valid buffer to display
     then
-      vim.wo.winbar = view.stl
-    else
+      vim.wo.winbar = Core.stl
+    elseif vim.wo.winbar ~= "" then -- winbar isn't already off
       vim.wo.winbar = ""
 
       vim.cmd([[ set winbar= ]])
@@ -126,8 +127,8 @@ function Core.should_display()
     end
   end
 
-  return vim.fn.win_gettype() == ""        -- is a normal window
-      and not (vim.bo.buftype == "prompt") -- and not a prompt buffer
+  return vim.fn.win_gettype() == ""  -- is a normal window
+      and vim.bo.buftype ~= "prompt" -- and not a prompt buffer
 end
 
 ---show a message for the duration of `options.message_timeout`
@@ -149,5 +150,7 @@ function Core.exec_task_modified_autocmd()
     group = state.auGroupID,
   })
 end
+
+Core.stl = "%!v:lua.DoingStatusline()"
 
 return Core

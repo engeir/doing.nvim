@@ -19,12 +19,11 @@ end
 function Core.add(task, to_front)
   state.tasks:sync(true)
   if task == nil then
-    vim.ui.input({ prompt = 'Enter the new task: ' },
-      function(input)
-        state.tasks:add(input, to_front)
-        Core.redraw_winbar_if_needed()
-        Core.exec_task_modified_autocmd()
-      end)
+    vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
+      state.tasks:add(input, to_front)
+      Core.redraw_winbar_if_needed()
+      Core.exec_task_modified_autocmd()
+    end)
   else
     state.tasks:add(task, to_front)
     Core.redraw_winbar_if_needed()
@@ -71,10 +70,10 @@ function Core.setup_winbar()
     vim.g.winbar = Core.stl
     vim.api.nvim_set_option_value("winbar", Core.stl, {})
 
-    state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true })
+    state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true, })
 
     -- winbar should not be displayed in windows the cursor is not in
-    vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    vim.api.nvim_create_autocmd({ "BufEnter", }, {
       group = state.auGroupID,
       callback = function()
         if state.view_enabled then
@@ -88,10 +87,11 @@ end
 ---redraw winbar depending on if there are tasks.
 ---redraw if there are pending tasks, otherwise set to ""
 function Core.redraw_winbar_if_needed()
-  if state.options.winbar.enabled then                 -- winbar enabled
-    if state.view_enabled                              -- display is enabled
-        and (state.tasks:count() > 0 or state.message) -- theres tasks/messages to show
-        and Core.should_display()                      -- is a valid buffer to display
+  if state.options.winbar.enabled then               -- winbar enabled
+    if
+       state.view_enabled                            -- display is enabled
+       and (state.tasks:count() > 0 or state.message) -- theres tasks/messages to show
+       and Core.should_display()                     -- is a valid buffer to display
     then
       vim.wo.winbar = Core.stl
     elseif vim.wo.winbar ~= "" then -- winbar isn't already off
@@ -105,8 +105,7 @@ end
 
 ---checks whether the current window/buffer can display a winbar
 function Core.should_display()
-  if vim.api.nvim_buf_get_name(0) == "" or
-      vim.fn.win_gettype() == "preview" then
+  if vim.api.nvim_buf_get_name(0) == "" or vim.fn.win_gettype() == "preview" then
     return false
   end
 
@@ -119,16 +118,17 @@ function Core.should_display()
   local home_path_abs = tostring(os.getenv("HOME"))
 
   for _, exclude in ipairs(ignore) do
-    if string.find(vim.bo.filetype, exclude)                        -- match filetype
-        or exclude == vim.fn.expand("%")                            -- match filename
-        or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
+    if
+       string.find(vim.bo.filetype, exclude)                      -- match filetype
+       or exclude == vim.fn.expand("%")                           -- match filename
+       or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
     then
       return false
     end
   end
 
-  return vim.fn.win_gettype() == ""  -- is a normal window
-      and vim.bo.buftype ~= "prompt" -- and not a prompt buffer
+  return vim.fn.win_gettype() == "" -- is a normal window
+     and vim.bo.buftype ~= "prompt" -- and not a prompt buffer
 end
 
 ---show a message for the duration of `options.message_timeout`

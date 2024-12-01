@@ -23,7 +23,7 @@ function View.status()
 
       -- append task count number if there is more than 1 task
       if count > 1 then
-        tasks_left = '+' .. (count - 1) .. " more"
+        tasks_left = "+" .. (count - 1) .. " more"
       end
 
       return res
@@ -37,7 +37,7 @@ function View.status()
       return current_string
     end
 
-    return current_string .. '  ' .. tasks_left
+    return current_string .. "  " .. tasks_left
   else
     return ""
   end

@@ -12,7 +12,7 @@ local State = {}
 State.default_opts = {
   message_timeout = 2000,
   doing_prefix = "Doing: ",
-  ignored_buffers = { "NvimTree" },
+  ignored_buffers = { "NvimTree", },
 
   winbar = {
     enabled = true,
@@ -21,7 +21,7 @@ State.default_opts = {
   store = {
     file_name = ".tasks",
     auto_create_file = false,
-  }
+  },
 }
 
 State.view_enabled = true
@@ -35,10 +35,10 @@ State.init = function(options)
   local default_state = {
     options = options,
     file = nil,
-    tasks = {}
+    tasks = {},
   }
 
-  local instance = setmetatable(default_state, { __index = State })
+  local instance = setmetatable(default_state, { __index = State, })
 
   local state = require("doing.state")
   vim.api.nvim_create_autocmd("DirChanged", {
@@ -66,8 +66,7 @@ end
 
 -- finds tasks file in cwd
 function State:import_file()
-  local file = vim.fn.findfile(vim.loop.cwd() ..
-    "/" .. State.options.store.file_name, ".;")
+  local file = vim.fn.findfile(vim.loop.cwd() .. "/" .. State.options.store.file_name, ".;")
 
   if file == "" then
     self.file = nil

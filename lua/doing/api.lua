@@ -1,7 +1,7 @@
-local view  = require("doing.view")
-local core  = require('doing.core')
+local view = require("doing.view")
+local core = require("doing.core")
 
-local Api   = {}
+local Api = {}
 
 ---returns the current task/message
 ---@return string

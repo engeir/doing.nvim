@@ -11,11 +11,11 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 ## Usage
 
--  `:Do` add a task to the end of the list
--  `:Do!` add a task to the front of list
--  `:Done` remove the first task from the list
--  `:DoEdit` edit the tasklist in a floating window
--  `:DoToggle` toggle the display
+- `:Do` add a task to the end of the list
+- `:Do!` add a task to the front of list
+- `:Done` remove the first task from the list
+- `:DoEdit` edit the tasklist in a floating window
+- `:DoToggle` toggle the display
 
 ## Installation
 
@@ -31,7 +31,7 @@ return {
 
 ## Configuration
 
-``` lua
+```lua
 -- example configuration
 return {
   "Hashino/doing.nvim",
@@ -51,7 +51,7 @@ return {
         -- name of tasks file
         file_name = ".tasks",
         -- automatically create a task file when openning directories
-        auto_create_file = false, 
+        auto_create_file = false,
       },
     }
     -- example on how to change the winbar highlight
@@ -59,9 +59,9 @@ return {
 
     local api = require("doing.api")
 
-    vim.keymap.set("n", "<leader>de", api.edit, 
+    vim.keymap.set("n", "<leader>de", api.edit,
        { desc = "[E]dit what tasks you`re [D]oing" })
-    vim.keymap.set("n", "<leader>dn", api.done, 
+    vim.keymap.set("n", "<leader>dn", api.done,
        { desc = "[D]o[n]e with current task" })
   end,
 }
@@ -70,7 +70,7 @@ return {
 ### Lualine
 
 In case you"d rather use it with another plugin instead of the default winbar
-implementation, you can use the exposed views to do so. 
+implementation, you can use the exposed views to do so.
 For example with lualine:
 
 ```lua
@@ -95,4 +95,3 @@ vim.api.nvim_create_autocmd({ "User" }, {
    end,
 })
 ```
-

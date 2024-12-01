@@ -4,7 +4,7 @@ local core = require("doing.core")
 
 create("Do", function(args)
   core.add(unpack(args.fargs), args.bang)
-end, { nargs = '?', bang = true })
+end, { nargs = "?", bang = true, })
 
 create("Done", core.done, {})
 

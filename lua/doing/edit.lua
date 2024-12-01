@@ -31,14 +31,14 @@ local function get_floating_window()
     col = vim.opt.columns:get() / 2 - width / 2,
     row = vim.opt.lines:get() / 2 - height / 2,
     width = width,
-    height = height
+    height = height,
   })
 
   vim.api.nvim_set_option_value("winhl", "Normal:NormalFloat", {})
 
   return {
     buf = bufnr,
-    win = win
+    win = win,
   }
 end
 
@@ -74,11 +74,11 @@ function Edit.open_edit(tasks, callback)
 
   vim.keymap.set("n", "q", function()
     close_edit(callback)
-  end, { buffer = global_buf })
+  end, { buffer = global_buf, })
 
   vim.keymap.set("n", "<Esc>", function()
     close_edit(callback)
-  end, { buffer = global_buf })
+  end, { buffer = global_buf, })
 
   -- event after tasks from pop up has been written to
   vim.api.nvim_create_autocmd("BufWriteCmd", {
@@ -87,7 +87,7 @@ function Edit.open_edit(tasks, callback)
     callback = function()
       local new_todos = get_buf_tasks()
       state.tasks:set(new_todos)
-    end
+    end,
   })
 
   vim.api.nvim_create_autocmd("BufModifiedSet", {
@@ -95,7 +95,7 @@ function Edit.open_edit(tasks, callback)
     buffer = global_buf,
     callback = function()
       vim.api.nvim_set_option_value("modified", false, {})
-    end
+    end,
   })
 end
 

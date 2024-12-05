@@ -1,4 +1,3 @@
----@class State
 local State = {}
 
 ---@class DoingOptions

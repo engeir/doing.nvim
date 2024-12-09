@@ -84,16 +84,16 @@ function Core.setup_winbar()
   end
 end
 
----redraw winbar depending on if there are tasks.
----redraw if there are pending tasks, otherwise set to ""
+---redraw winbar depending on if there are tasks
 function Core.redraw_winbar_if_needed()
-  if state.options.winbar.enabled then               -- winbar enabled
+  if state.options.winbar.enabled then                -- winbar enabled
     if
-       state.view_enabled                            -- display is enabled
+       state.view_enabled                             -- display is enabled
        and (state.tasks:count() > 0 or state.message) -- theres tasks/messages to show
-       and Core.should_display()                     -- is a valid buffer to display
+       and Core.should_display()                      -- is a valid buffer to display
     then
       vim.wo.winbar = Core.stl
+
     elseif vim.wo.winbar ~= "" then -- winbar isn't already off
       vim.wo.winbar = ""
 
@@ -119,8 +119,8 @@ function Core.should_display()
 
   for _, exclude in ipairs(ignore) do
     if
-       string.find(vim.bo.filetype, exclude)                      -- match filetype
-       or exclude == vim.fn.expand("%")                           -- match filename
+       string.find(vim.bo.filetype, exclude)                       -- match filetype
+       or exclude == vim.fn.expand("%")                            -- match filename
        or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
     then
       return false

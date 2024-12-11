@@ -1,4 +1,3 @@
-local view = require("doing.view")
 local edit = require("doing.edit")
 local state = require("doing.state")
 
@@ -10,9 +9,20 @@ function Core.setup(opts)
   state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
   state.tasks = state.init(state.options.store)
 
-  Core.setup_winbar()
+  -- doesn't touch the winbar if disabled so other plugins can manage
+  -- it without interference
+  if state.options.winbar.enabled then
+    state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true, })
 
-  return Core
+    vim.api.nvim_create_autocmd({ "BufEnter", }, {
+      group = state.auGroupID,
+      callback = function()
+        if state.view_enabled then
+          Core.update_winbar()
+        end
+      end,
+    })
+  end
 end
 
 ---add a task to the list
@@ -21,12 +31,12 @@ function Core.add(task, to_front)
   if task == nil then
     vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
       state.tasks:add(input, to_front)
-      Core.redraw_winbar_if_needed()
+      Core.update_winbar()
       Core.exec_task_modified_autocmd()
     end)
   else
     state.tasks:add(task, to_front)
-    Core.redraw_winbar_if_needed()
+    Core.update_winbar()
     Core.exec_task_modified_autocmd()
   end
 end
@@ -56,50 +66,42 @@ function Core.done()
   end
 end
 
----toggle the visibility of the plugin
-function Core.toggle_display()
-  state.view_enabled = not state.view_enabled
-  Core.redraw_winbar_if_needed()
+---show a message for the duration of `options.message_timeout`
+function Core.show_message(str)
+  state.message = str
+  Core.update_winbar()
+
+  vim.defer_fn(function()
+    state.message = nil
+    Core.update_winbar()
+  end, state.default_opts.message_timeout)
 end
 
----configure displaying current to do item in winbar
-function Core.setup_winbar()
-  if state.options.winbar.enabled then
-    _G.DoingStatusline = view.status
+function Core.status()
+  if state.view_enabled and Core.should_display() then
+    if state.message then
+      return state.message
+    elseif state.tasks:count() > 0 then
+      local tasks_left = ""
+      local count = state.tasks:count()
 
-    vim.g.winbar = Core.stl
-    vim.api.nvim_set_option_value("winbar", Core.stl, {})
+      -- append task count number if there is more than 1 task
+      if count > 1 then
+        tasks_left = "  +" .. (state.tasks:count() - 1) .. " more"
+      end
 
-    state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true, })
-
-    -- winbar should not be displayed in windows the cursor is not in
-    vim.api.nvim_create_autocmd({ "BufEnter", }, {
-      group = state.auGroupID,
-      callback = function()
-        if state.view_enabled then
-          Core.redraw_winbar_if_needed()
-        end
-      end,
-    })
+      return state.options.doing_prefix .. state.tasks:current() .. tasks_left
+    end
   end
+  return ""
 end
 
 ---redraw winbar depending on if there are tasks
-function Core.redraw_winbar_if_needed()
-  if state.options.winbar.enabled then                -- winbar enabled
-    if
-       state.view_enabled                             -- display is enabled
-       and (state.tasks:count() > 0 or state.message) -- theres tasks/messages to show
-       and Core.should_display()                      -- is a valid buffer to display
-    then
-      vim.wo.winbar = Core.stl
-
-    elseif vim.wo.winbar ~= "" then -- winbar isn't already off
-      vim.wo.winbar = ""
-
-      vim.cmd([[ set winbar= ]])
-      vim.cmd([[ redrawstatus ]])
-    end
+function Core.update_winbar()
+  if state.options.winbar.enabled -- winbar enabled
+     and Core.should_display()    -- is a valid buffer to display
+  then
+    vim.api.nvim_set_option_value("winbar", Core.status(), { scope = "local", })
   end
 end
 
@@ -107,40 +109,34 @@ end
 function Core.should_display()
   if vim.api.nvim_buf_get_name(0) == "" or vim.fn.win_gettype() == "preview" then
     return false
-  end
+  else
+    local ignore = state.options.ignored_buffers
 
-  local ignore = state.options.ignored_buffers
-
-  if type(ignore) == "function" then
-    ignore = ignore()
-  end
-
-  local home_path_abs = tostring(os.getenv("HOME"))
-
-  for _, exclude in ipairs(ignore) do
-    if
-       string.find(vim.bo.filetype, exclude)                       -- match filetype
-       or exclude == vim.fn.expand("%")                            -- match filename
-       or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
-    then
-      return false
+    if type(ignore) == "function" then
+      ignore = ignore()
     end
-  end
 
-  return vim.fn.win_gettype() == "" -- is a normal window
-     and vim.bo.buftype ~= "prompt" -- and not a prompt buffer
+    local home_path_abs = tostring(os.getenv("HOME"))
+
+    for _, exclude in ipairs(ignore) do
+      if
+         string.find(vim.bo.filetype, exclude)                       -- match filetype
+         or exclude == vim.fn.expand("%")                            -- match filename
+         or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
+      then
+        return false
+      end
+    end
+
+    return vim.fn.win_gettype() == "" -- is a normal window
+       and vim.bo.buftype ~= "prompt" -- and not a prompt buffer
+  end
 end
 
----show a message for the duration of `options.message_timeout`
-function Core.show_message(str)
-  state.message = str
-
-  vim.defer_fn(function()
-    state.message = nil
-    Core.redraw_winbar_if_needed()
-  end, state.default_opts.message_timeout)
-
-  Core.redraw_winbar_if_needed()
+---toggle the visibility of the plugin
+function Core.toggle_display()
+  state.view_enabled = not state.view_enabled
+  Core.update_winbar()
 end
 
 ---execute the auto command when a task is modified
@@ -150,7 +146,5 @@ function Core.exec_task_modified_autocmd()
     group = state.auGroupID,
   })
 end
-
-Core.stl = "%!v:lua.DoingStatusline()"
 
 return Core

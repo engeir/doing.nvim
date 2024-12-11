@@ -1,4 +1,3 @@
-local view = require("doing.view")
 local core = require("doing.core")
 
 local Api = {}
@@ -6,7 +5,7 @@ local Api = {}
 ---returns the current task/message
 ---@return string
 function Api.status()
-  return view.status()
+  return core.status()
 end
 
 ---add a task to the list

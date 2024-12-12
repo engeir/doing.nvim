@@ -18,7 +18,8 @@ function Core.setup(opts)
       group = state.auGroupID,
       callback = function()
         if state.view_enabled then
-          Core.update_winbar()
+          -- gives time to process filetype
+          vim.defer_fn(Core.update_winbar, 100)
         end
       end,
     })
@@ -31,13 +32,11 @@ function Core.add(task, to_front)
   if task == nil then
     vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
       state.tasks:add(input, to_front)
-      Core.update_winbar()
-      Core.exec_task_modified_autocmd()
+      Core.task_modified()
     end)
   else
     state.tasks:add(task, to_front)
-    Core.update_winbar()
-    Core.exec_task_modified_autocmd()
+    Core.task_modified()
   end
 end
 
@@ -45,7 +44,7 @@ end
 function Core.edit()
   edit.open_edit(state.tasks:get(), function(new_todos)
     state.tasks:set(new_todos)
-    Core.exec_task_modified_autocmd()
+    Core.task_modified()
   end)
 end
 
@@ -60,7 +59,7 @@ function Core.done()
       Core.show_message(state.tasks:count() .. " left.")
     end
 
-    Core.exec_task_modified_autocmd()
+    Core.task_modified()
   else
     Core.show_message("There was nothing left to do ")
   end
@@ -77,6 +76,7 @@ function Core.show_message(str)
   end, state.default_opts.message_timeout)
 end
 
+-- TODO: lualine calls this function way too often
 function Core.status()
   if state.view_enabled and Core.should_display() then
     if state.message then
@@ -107,9 +107,11 @@ end
 
 ---checks whether the current window/buffer can display a winbar
 function Core.should_display()
-  if vim.api.nvim_buf_get_name(0) == "" or vim.fn.win_gettype() == "preview" then
-    return false
-  else
+  if (vim.fn.win_gettype() ~= "preview"
+       or vim.bo.buftype ~= "popup"
+       or vim.bo.buftype ~= "prompt")
+     and vim.fn.win_gettype() == "" -- normal window
+  then
     local ignore = state.options.ignored_buffers
 
     if type(ignore) == "function" then
@@ -120,16 +122,16 @@ function Core.should_display()
 
     for _, exclude in ipairs(ignore) do
       if
-         string.find(vim.bo.filetype, exclude)                       -- match filetype
+         vim.bo.filetype:find(exclude)                               -- match filetype
          or exclude == vim.fn.expand("%")                            -- match filename
          or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
       then
         return false
       end
     end
-
-    return vim.fn.win_gettype() == "" -- is a normal window
-       and vim.bo.buftype ~= "prompt" -- and not a prompt buffer
+    return true
+  else
+    return false
   end
 end
 
@@ -140,7 +142,8 @@ function Core.toggle_display()
 end
 
 ---execute the auto command when a task is modified
-function Core.exec_task_modified_autocmd()
+function Core.task_modified()
+  Core.update_winbar()
   vim.api.nvim_exec_autocmds("User", {
     pattern = "TaskModified",
     group = state.auGroupID,

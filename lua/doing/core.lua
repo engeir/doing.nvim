@@ -68,11 +68,11 @@ end
 ---show a message for the duration of `options.message_timeout`
 function Core.show_message(str)
   state.message = str
-  Core.update_winbar()
+  Core.task_modified()
 
   vim.defer_fn(function()
     state.message = nil
-    Core.update_winbar()
+    Core.task_modified()
   end, state.default_opts.message_timeout)
 end
 

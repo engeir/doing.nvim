@@ -67,10 +67,11 @@ return {
 }
 ```
 
-### Lualine
+### Integration
 
 In case you"d rather use it with another plugin instead of the default winbar
 implementation, you can use the exposed views to do so.
+
 For example with lualine:
 
 ```lua
@@ -79,6 +80,16 @@ require("lualine").setup {
     lualine_a = { require"doing.api".status },
   },
 }
+```
+
+with heirline:
+```lua
+{
+  provider = function()
+    return " " .. require("doing.api").status() .. " "
+  end,
+  update = { "BufEnter", "User", pattern = "TaskModified", },
+},
 ```
 
 ### Events

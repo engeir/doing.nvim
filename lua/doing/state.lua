@@ -6,6 +6,7 @@ local State = {}
 ---@field doing_prefix string prefix to show before the task
 ---@field winbar.enabled boolean if plugin should manage the winbar
 ---@field store.file_name string name of the task file
+---@field store.auto_delete_file boolean auto delete tasks file
 
 State.default_opts = {
   message_timeout = 2000,
@@ -44,26 +45,26 @@ State.init = function(options)
       state.tasks = State.init(state.options.store)
     end,
   })
-
-  return instance:set(instance:import_file() or {})
+  instance.tasks = instance:import_file() or {}
+  return instance
 end
 
 -- creates a file based on configs
 function State:create_file()
   local name = State.options.store.file_name
-  local cwd = vim.loop.cwd()
+  local cwd = vim.fn.getcwd()
   local file = io.open(cwd .. "/" .. name, "w")
   assert(file, "couldn't create " .. name .. " in current cwd: " .. cwd)
 
   file:write("")
   file:close()
 
-  return name
+  return cwd .. "/" .. name
 end
 
 -- finds tasks file in cwd
 function State:import_file()
-  local file = vim.fn.findfile(vim.loop.cwd() .. "/" .. State.options.store.file_name, ".;")
+  local file = vim.fn.findfile(vim.fn.getcwd() .. "/" .. State.options.store.file_name, ".;")
 
   if file == "" then
     self.file = nil
@@ -77,14 +78,29 @@ function State:import_file()
   return self.file and vim.fn.readfile(self.file) or nil
 end
 
+local function delete_file(file_path)
+  vim.schedule_wrap(function()
+    local success, err, err_name = vim.loop.fs_unlink(file_path)
+
+    if not success then
+      vim.notify(tostring(err_name) .. ":" .. tostring(err),
+        vim.log.levels.ERROR, { title = "doing.nvim: error deleting tasks file", })
+    end
+  end)()
+end
+
 -- syncs file tasks with loaded tasks. creates file if force == true
 function State:sync()
   if (not self.file) and #self.tasks > 0 then
     self.file = self:create_file()
+  elseif self.file and #self.tasks == 0 then
+    delete_file(self.file)
   end
 
   if vim.fn.filewritable(self.file) then
-    vim.fn.writefile(self.tasks, self.file)
+    if self.file then
+      vim.fn.writefile(self.tasks, self.file)
+    end
   else
     error(string.format("Cannot write file %s", self.file))
   end

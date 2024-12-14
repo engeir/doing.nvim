@@ -22,16 +22,18 @@ end
 -- creates window
 local function get_floating_window()
   local bufnr = vim.api.nvim_create_buf(false, false)
-  local width = math.min(vim.opt.columns:get(), 80)
-  local height = math.min(vim.opt.lines:get(), 12)
+
+  local win_width = math.min(vim.opt.columns:get(), 80)
+  local win_height = math.min(vim.opt.lines:get(), 12)
+
   local win = vim.api.nvim_open_win(bufnr, true, {
     relative = "editor",
     border = "rounded",
     noautocmd = false,
-    col = vim.opt.columns:get() / 2 - width / 2,
-    row = vim.opt.lines:get() / 2 - height / 2,
-    width = width,
-    height = height,
+    col = vim.opt.columns:get() / 2 - win_width / 2,
+    row = vim.opt.lines:get() / 2 - win_height / 2,
+    width = win_width,
+    height = win_height,
   })
 
   vim.api.nvim_set_option_value("winhl", "Normal:NormalFloat", {})

@@ -17,10 +17,8 @@ function Core.setup(opts)
     vim.api.nvim_create_autocmd({ "BufEnter", }, {
       group = state.auGroupID,
       callback = function()
-        if state.view_enabled then
-          -- gives time to process filetype
-          vim.defer_fn(Core.update_winbar, 100)
-        end
+        -- gives time to process filetype
+        vim.defer_fn(Core.update_winbar, 100)
       end,
     })
   end

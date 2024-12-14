@@ -50,8 +50,6 @@ return {
       store = {
         -- name of tasks file
         file_name = ".tasks",
-        -- automatically create a task file when openning directories
-        auto_create_file = false,
       },
     }
     -- example on how to change the winbar highlight
@@ -94,7 +92,8 @@ with heirline:
 
 ### Events
 
-This plugin exposes a custom event, for when a task is added or modified. You can use it like so:
+This plugin exposes a custom event, for when a task is added or modified. You
+can use it like so:
 
 ```lua
 vim.api.nvim_create_autocmd({ "User" }, {

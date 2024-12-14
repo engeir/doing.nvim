@@ -74,7 +74,6 @@ function Core.show_message(str)
   end, state.default_opts.message_timeout)
 end
 
--- TODO: lualine calls this function way too often
 function Core.status()
   if state.view_enabled and Core.should_display() then
     if state.message then
@@ -96,47 +95,53 @@ end
 
 ---redraw winbar depending on if there are tasks
 function Core.update_winbar()
-  if state.options.winbar.enabled -- winbar enabled
-     and Core.should_display()    -- is a valid buffer to display
-  then
+  if state.options.winbar.enabled then
     vim.api.nvim_set_option_value("winbar", Core.status(), { scope = "local", })
   end
 end
 
----checks whether the current window/buffer can display a winbar
+---checks whether the current window/buffer should display the plugin
 function Core.should_display()
-  if (vim.fn.win_gettype() ~= "preview"
-       or vim.bo.buftype ~= "popup"
-       or vim.bo.buftype ~= "prompt")
-     and vim.fn.win_gettype() == "" -- normal window
+  -- once a window gets checked once, a variable is set to tell doing
+  -- if it should render itself in it
+  -- this avoids redoing the cheking on every update
+  if vim.b.doing_should_display then
+    return vim.b.doing_should_display
+  end
+
+  if vim.bo.buftype == "popup"
+     or vim.bo.buftype == "prompt"
+     or vim.fn.win_gettype() ~= ""
   then
-    local ignore = state.options.ignored_buffers
-
-    if type(ignore) == "function" then
-      ignore = ignore()
-    end
-
-    local home_path_abs = tostring(os.getenv("HOME"))
-
-    for _, exclude in ipairs(ignore) do
-      if
-         vim.bo.filetype:find(exclude)                               -- match filetype
-         or exclude == vim.fn.expand("%")                            -- match filename
-         or exclude:gsub("~", home_path_abs) == vim.fn.expand("%:p") -- match filepath
-      then
-        return false
-      end
-    end
-    return true
-  else
+    vim.b.doing_should_display = false -- saves result to a buffer variable
     return false
   end
+
+  local ignore = state.options.ignored_buffers
+  ignore = type(ignore) == "function" and ignore() or ignore
+
+  local home_path_abs = tostring(os.getenv("HOME"))
+  local curr = vim.fn.expand("%:p")
+
+  for _, exclude in ipairs(ignore) do
+    if
+       vim.bo.filetype:find(exclude)               -- match filetype
+       or exclude == vim.fn.expand("%")            -- match filename
+       or exclude:gsub("~", home_path_abs) == curr -- match filepath
+    then
+      vim.b.doing_should_display = false           -- saves result to a buffer variable
+      return false
+    end
+  end
+
+  vim.b.doing_should_display = true -- saves result to a buffer variable
+  return true
 end
 
 ---toggle the visibility of the plugin
 function Core.toggle_display()
   state.view_enabled = not state.view_enabled
-  Core.update_winbar()
+  Core.task_modified()
 end
 
 ---execute the auto command when a task is modified

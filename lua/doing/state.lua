@@ -6,7 +6,6 @@ local State = {}
 ---@field doing_prefix string prefix to show before the task
 ---@field winbar.enabled boolean if plugin should manage the winbar
 ---@field store.file_name string name of the task file
----@field store.auto_create_file boolean if true, creates task file on opening directory
 
 State.default_opts = {
   message_timeout = 2000,
@@ -19,7 +18,6 @@ State.default_opts = {
 
   store = {
     file_name = ".tasks",
-    auto_create_file = false,
   },
 }
 
@@ -80,11 +78,9 @@ function State:import_file()
 end
 
 -- syncs file tasks with loaded tasks. creates file if force == true
-function State:sync(force)
-  if not self.file and (State.options.store.auto_create_file or force) then
+function State:sync()
+  if (not self.file) and #self.tasks > 0 then
     self.file = self:create_file()
-  elseif not self.file then
-    return self
   end
 
   if vim.fn.filewritable(self.file) then

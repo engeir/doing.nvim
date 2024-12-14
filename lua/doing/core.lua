@@ -26,7 +26,7 @@ end
 
 ---add a task to the list
 function Core.add(task, to_front)
-  state.tasks:sync(true)
+  state.tasks:sync()
   if task == nil then
     vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
       state.tasks:add(input, to_front)

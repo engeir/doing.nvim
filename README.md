@@ -1,4 +1,4 @@
-# Doing.nvim
+# doing.nvim
 
 A tiny task manager within nvim that helps you stay on track by keeping a stack
 of tasks and always showing which task is at the top and how many more you have.

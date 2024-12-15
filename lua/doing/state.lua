@@ -80,7 +80,7 @@ end
 
 local function delete_file(file_path)
   vim.schedule_wrap(function()
-    local success, err, err_name = vim.loop.fs_unlink(file_path)
+    local success, err, err_name = (vim.uv or vim.loop).fs_unlink(file_path)
 
     if not success then
       vim.notify(tostring(err_name) .. ":" .. tostring(err),
@@ -97,12 +97,12 @@ function State:sync()
     delete_file(self.file)
   end
 
-  if vim.fn.filewritable(self.file) then
-    if self.file then
-      vim.fn.writefile(self.tasks, self.file)
+  if self.file and vim.fn.filewritable(self.file) and self.tasks ~= {} then
+    local res = vim.fn.writefile(self.tasks, self.file)
+    if res ~= 0 then
+      vim.notify("error writing to tasks file",
+        vim.log.levels.ERROR, { title = "doing.nvim", })
     end
-  else
-    error(string.format("Cannot write file %s", self.file))
   end
 
   return self

@@ -20,11 +20,11 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 ## Installation
 
 lazy.nvim:
-
 ```lua
 -- minimal installation
-return {
+{
   "Hashino/doing.nvim",
+  -- winbar won't load correctly if lazy loaded
   config = true,
 }
 ```
@@ -33,15 +33,16 @@ return {
 
 ```lua
 -- example configuration
-return {
+{
   "Hashino/doing.nvim",
   config = function()
     require("doing").setup {
       message_timeout = 2000,
       doing_prefix = "Doing: ",
 
-      -- doesn"t display on buffers that match filetype/filename to entries
-      -- can be either an array or a function that returns an array
+      -- doesn"t display on buffers that match filetype/filename/filepath to entries
+      -- can be either a string array or a function that returns a string array
+      -- filepath can be relative or absolute
       ignored_buffers = { "NvimTree" }
 
       -- if plugin should manage the winbar

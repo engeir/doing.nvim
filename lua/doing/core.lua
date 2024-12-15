@@ -128,6 +128,12 @@ function Core.should_display()
   local curr = vim.fn.expand("%:p")
 
   for _, exclude in ipairs(ignore) do
+    -- checks if exclude is a relative filepath and expands it
+    if exclude:sub(1, 2) == "./" then
+      exclude = vim.fn.getcwd() .. exclude:sub(2, -1)
+      vim.notify(exclude)
+    end
+
     if
        vim.bo.filetype:find(exclude)               -- match filetype
        or exclude == vim.fn.expand("%")            -- match filename

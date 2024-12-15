@@ -4,7 +4,7 @@ local state = require("doing.state")
 local Core = {}
 
 ---setup doing.nvim
----@param opts DoingOptions
+---@param opts? DoingOptions
 function Core.setup(opts)
   state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
   state.tasks = state.init(state.options.store)
@@ -75,6 +75,10 @@ function Core.show_message(str)
 end
 
 function Core.status()
+  if not state.tasks then
+    Core.setup()
+  end
+
   if state.view_enabled and Core.should_display() then
     if state.message then
       return state.message

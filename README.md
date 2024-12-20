@@ -1,5 +1,7 @@
 # doing.nvim
 
+<a href="https://www.buymeacoffee.com/hashino" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 24px !important;width: 104px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 A tiny task manager within nvim that helps you stay on track by keeping a stack
 of tasks and always showing which task is at the top and how many more you have.
 
@@ -106,3 +108,4 @@ vim.api.nvim_create_autocmd({ "User" }, {
    end,
 })
 ```
+

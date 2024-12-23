@@ -1,5 +1,7 @@
 # doing.nvim
 
+<a href="https://www.buymeacoffee.com/hashino" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 24px !important;width: 104px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 A tiny task manager within nvim that helps you stay on track by keeping a stack
 of tasks and always showing which task is at the top and how many more you have.
 
@@ -31,6 +33,9 @@ lazy.nvim:
 
 ## Configuration
 
+this plugin sets no keymaps by itself. an example on how to set them is given
+below
+
 ```lua
 -- example configuration
 {
@@ -56,12 +61,13 @@ lazy.nvim:
     -- example on how to change the winbar highlight
     vim.api.nvim_set_hl(0, "WinBar", { link = "Search" })
 
-    local api = require("doing.api")
+    local doing = require("doing")
 
-    vim.keymap.set("n", "<leader>de", api.edit,
-       { desc = "[E]dit what tasks you`re [D]oing" })
-    vim.keymap.set("n", "<leader>dn", api.done,
-       { desc = "[D]o[n]e with current task" })
+    -- example keymaps
+    vim.keymap.set("n", "<leader>da", doing.add, { desc = "[D]oing: [A]dd" })
+    vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit" })
+    vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e" })
+    vim.keymap.set("n", "<leader>dt", doing.toggle, { desc = "[D]oing: [T]oggle" })
   end,
 }
 ```
@@ -76,7 +82,7 @@ For example with lualine:
 ```lua
 require("lualine").setup {
   winbar = {
-    lualine_a = { require"doing.api".status },
+    lualine_a = { require"doing".status },
   },
 }
 ```
@@ -85,7 +91,7 @@ with heirline:
 ```lua
 {
   provider = function()
-    return " " .. require("doing.api").status() .. " "
+    return " " .. require("doing").status() .. " "
   end,
   update = { "BufEnter", "User", pattern = "TaskModified", },
 },
@@ -100,9 +106,10 @@ can use it like so:
 vim.api.nvim_create_autocmd({ "User" }, {
    group = require("doing.state").auGroupID,
    pattern = "TaskModified",
-   desc = "This is called when a task is added or deleted",
+   desc = "This is called when a task is added, edited or deleted",
    callback = function()
       vim.notify("A task has been modified")
    end,
 })
 ```
+

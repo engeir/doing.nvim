@@ -8,7 +8,7 @@ end, { nargs = "?", bang = true, })
 
 create("Done", core.done, {})
 
-create("DoToggle", core.toggle_display, {})
+create("DoToggle", core.toggle, {})
 create("DoEdit", core.edit, {})
 
 return core

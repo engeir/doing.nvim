@@ -45,10 +45,13 @@ below
       message_timeout = 2000,
       doing_prefix = "Doing: ",
 
-      -- doesn"t display on buffers that match filetype/filename/filepath to entries
-      -- can be either a string array or a function that returns a string array
-      -- filepath can be relative or absolute
+      -- doesn"t display on buffers that match filetype/filename/filepath to
+      -- entries can be either a string array or a function that returns a
+      -- string array filepath can be relative or absolute
       ignored_buffers = { "NvimTree" }
+
+      -- if should append "+n more" to the status if more than 1 tasks
+      show_remaining = true,
 
       -- if plugin should manage the winbar
       winbar = { enabled = true, },

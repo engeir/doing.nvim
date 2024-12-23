@@ -7,11 +7,13 @@ local State = {}
 ---@field winbar.enabled boolean if plugin should manage the winbar
 ---@field store.file_name string name of the task file
 ---@field store.auto_delete_file boolean auto delete tasks file
+---@field show_remaining boolean show "+n more" when there are more than 1 tasks
 
 State.default_opts = {
   message_timeout = 2000,
   doing_prefix = "Doing: ",
   ignored_buffers = { "NvimTree", },
+  show_remaining = true,
 
   winbar = {
     enabled = true,

@@ -92,9 +92,11 @@ function Core.status()
       local tasks_left = ""
       local count = state.tasks:count()
 
-      -- append task count number if there is more than 1 task
-      if count > 1 then
-        tasks_left = "  +" .. (state.tasks:count() - 1) .. " more"
+      if state.options.show_remaining then
+        -- append task count number if there is more than 1 task
+        if count > 1 then
+          tasks_left = "  +" .. (state.tasks:count() - 1) .. " more"
+        end
       end
 
       return state.options.doing_prefix .. state.tasks:current() .. tasks_left

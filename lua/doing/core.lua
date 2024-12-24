@@ -92,6 +92,9 @@ function Core.status(force)
       return state.options.doing_prefix .. state.tasks:current() .. tasks_left
     end
   end
+  if force then
+    return "All tasks done"
+  end
   return ""
 end
 

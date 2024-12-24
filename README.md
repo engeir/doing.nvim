@@ -2,8 +2,8 @@
 
 <a href="https://www.buymeacoffee.com/hashino" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 24px !important;width: 104px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-A tiny task manager within nvim that helps you stay on track by keeping a stack
-of tasks and always showing which task is at the top and how many more you have.
+A tiny task manager within neovim that helps you stay on track by keeping a stack
+of tasks and always showing the first task and how many more you have.
 
 It works by storing the tasks in a plain text file
 
@@ -42,6 +42,7 @@ below
 {
   "Hashino/doing.nvim",
   config = function()
+    -- default options
     require("doing").setup {
       message_timeout = 2000,
       doing_prefix = "Doing: ",
@@ -51,7 +52,7 @@ below
       -- string array filepath can be relative or absolute
       ignored_buffers = { "NvimTree" }
 
-      -- if should append "+n more" to the status if more than 1 tasks
+      -- if should append "+n more" to the status if there's tasks remaining
       show_remaining = true,
 
       -- if plugin should manage the winbar
@@ -67,7 +68,6 @@ below
 
     local doing = require("doing")
 
-    -- example keymaps
     vim.keymap.set("n", "<leader>da", doing.add, { desc = "[D]oing: [A]dd" })
     vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit" })
     vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e" })
@@ -78,15 +78,15 @@ below
 
 ### Integration
 
-In case you"d rather use it with another plugin instead of the default winbar
-implementation, you can use the exposed views to do so.
+In case you'd rather display the tasks with another plugin instead of the
+default winbar implementation, you can use the exposed views to do so.
 
 For example with lualine:
 
 ```lua
 require("lualine").setup {
   winbar = {
-    lualine_a = { require"doing".status },
+    lualine_a = { require("doing").status },
   },
 }
 ```
@@ -117,3 +117,40 @@ vim.api.nvim_create_autocmd({ "User" }, {
 })
 ```
 
+### Recipes
+
+If your winbar is already in use and your status bar is full, you can use doing
+with just notifications:
+
+```lua
+{
+  "Hashino/doing.nvim",
+  config = function()
+    require("doing").setup({
+      -- if plugin should manage the winbar
+      winbar = { enabled = false, },
+    })
+
+    local doing = require("doing")
+
+    -- example keymaps
+    vim.keymap.set("n", "<leader>da", doing.add, { desc = "[D]oing: [A]dd", })
+    vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit", })
+    vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e", })
+    vim.keymap.set("n", "<leader>ds", function()
+      vim.notify(doing.status(true), vim.log.levels.INFO)
+    end, { desc = "[D]oing: [S]tatus", })
+
+    vim.api.nvim_create_autocmd({ "User", }, {
+      group = require("doing.state").auGroupID,
+      pattern = "TaskModified",
+      desc = "This is called when a task is added, edited or deleted",
+      callback = function()
+        vim.defer_fn(function()
+          vim.notify(doing.status(true), vim.log.levels.INFO)
+        end, 0)
+      end,
+    })
+  end,
+}
+```

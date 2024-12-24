@@ -25,14 +25,10 @@ local do_cmds = {
 
 -- sets up the `:Do` command
 vim.api.nvim_create_user_command("Do", function(args)
-  -- splits the arguments into a list
   local args_list = vim.split(args.args, "%s+", { trimempty = true, })
-
-  -- gets the first argument as the command
   local cmd = table.remove(args_list, 1)
 
   if vim.tbl_contains(vim.tbl_keys(do_cmds), cmd) then
-    -- calls the command via table lookup with the arguments
     do_cmds[cmd](args_list, args.bang)
   else
     vim.notify("invalid command: " .. cmd, vim.log.levels.ERROR,

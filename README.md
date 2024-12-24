@@ -53,7 +53,7 @@ below
       -- string array filepath can be relative or absolute
       ignored_buffers = { "NvimTree" }
 
-      -- if should append "+n more" to the status if there's tasks remaining
+      -- if should append "+n more" to the status when there's tasks remaining
       show_remaining = true,
 
       -- if plugin should manage the winbar

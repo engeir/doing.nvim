@@ -13,11 +13,12 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 ## Usage
 
-- `:Do` add a task to the end of the list
-- `:Do!` add a task to the front of list
-- `:Done` remove the first task from the list
-- `:DoEdit` edit the tasklist in a floating window
-- `:DoToggle` toggle the display
+- `:Do add {task}` add a {task} to the end of the list
+- `:Do! add {task}` add a {task} to the front of list
+- `:Do status` shows notification with current task/message (even if toggled off)
+- `:Do done` remove the first task from the list
+- `:Do edit` edit the tasklist in a floating window
+- `:Do toggle` toggle the display (winbar and status)
 
 ## Installation
 

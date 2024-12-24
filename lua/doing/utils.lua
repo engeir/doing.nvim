@@ -2,7 +2,7 @@ local state = require("doing.state")
 
 local Utils = {}
 
----execute the auto command when a task is modified
+--- gets called when a task is added, edited, or removed
 function Utils.task_modified()
   Utils.update_winbar()
   vim.api.nvim_exec_autocmds("User", {
@@ -14,7 +14,7 @@ end
 ---redraw winbar depending on if there are tasks
 function Utils.update_winbar()
   if state.options.winbar.enabled then
-    vim.api.nvim_set_option_value( "winbar", require("doing").status(),
+    vim.api.nvim_set_option_value("winbar", require("doing").status(),
       { scope = "local", })
   end
 end
@@ -61,6 +61,19 @@ function Utils.should_display()
 
   vim.b.doing_should_display = true -- saves result to a buffer variable
   return true
+end
+
+--- show a message for the duration of `options.message_timeout` or timeout
+---@param str string message to show
+---@param timeout? number time in ms to show message
+function Utils.show_message(str, timeout)
+  state.message = str
+  Utils.task_modified()
+
+  vim.defer_fn(function()
+    state.message = nil
+    Utils.task_modified()
+  end, timeout or state.options.message_timeout)
 end
 
 return Utils

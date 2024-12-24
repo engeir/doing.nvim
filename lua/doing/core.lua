@@ -1,6 +1,6 @@
-local utils = require("doing.utils")
 local edit = require("doing.edit")
 local state = require("doing.state")
+local utils = require("doing.utils")
 
 local Core = {}
 
@@ -19,7 +19,9 @@ function Core.setup(opts)
       group = state.auGroupID,
       callback = function()
         -- gives time to process filetype
-        vim.defer_fn(utils.update_winbar, 100)
+        vim.defer_fn(function()
+          utils.update_winbar()
+        end, 100)
       end,
     })
   end
@@ -55,37 +57,25 @@ function Core.done()
     state.tasks:pop()
 
     if state.tasks:count() == 0 then
-      Core.show_message("All tasks done ")
+      utils.show_message("All tasks done ")
     else
-      Core.show_message(state.tasks:count() .. " left.")
+      utils.show_message(state.tasks:count() .. " left.")
     end
 
     utils.task_modified()
   else
-    Core.show_message("There was nothing left to do ")
+    utils.show_message("There was nothing left to do ")
   end
 end
 
---- show a message for the duration of `options.message_timeout` or timeout
----@param str string message to show
----@param timeout? number time in ms to show message
-function Core.show_message(str, timeout)
-  state.message = str
-  utils.task_modified()
-
-  vim.defer_fn(function()
-    state.message = nil
-    utils.task_modified()
-  end, timeout or state.options.message_timeout)
-end
-
--- shows current plugin task/message
-function Core.status()
+-- returns current plugin task/message
+-- @param force boolean displays the message even if the plugin display is turned off
+function Core.status(force)
   if not state.tasks then
     Core.setup()
   end
 
-  if state.view_enabled and utils.should_display() then
+  if (state.view_enabled or force) and utils.should_display() then
     if state.message then
       return state.message
     elseif state.tasks:count() > 0 then

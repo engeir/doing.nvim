@@ -31,15 +31,19 @@ end
 ---@param task? string task to add
 ---@param to_front? boolean whether to add task to front of list
 function Core.add(task, to_front)
-  state.tasks:sync()
-  if task == nil then
-    vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
-      state.tasks:add(input, to_front)
+  if task ~= nil and task ~= "" then
+    state.tasks:sync()
+    if task == nil then
+      vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
+        state.tasks:add(input, to_front)
+        utils.task_modified()
+      end)
+    else
+      state.tasks:add(task, to_front)
       utils.task_modified()
-    end)
+    end
   else
-    state.tasks:add(task, to_front)
-    utils.task_modified()
+    vim.notify("No task provided", vim.log.levels.ERROR, { title = "doing.nvim", })
   end
 end
 

@@ -21,6 +21,10 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 - `:Do edit` edit the tasklist in a floating window
 - `:Do toggle` toggle the display (winbar and status)
 
+> [!NOTE]
+> if the command is unrecognized it defaults to `add`. so `Do {task}` and
+> `Do! {task}` are equivalent to `Do add {task}` and `Do! add {task}`
+
 ## Installation
 
 lazy.nvim:

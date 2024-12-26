@@ -21,8 +21,7 @@ vim.api.nvim_create_user_command("Do", function(args)
   if vim.tbl_contains(vim.tbl_keys(do_cmds), cmd) then
     do_cmds[cmd](cmd_args, args.bang)
   else
-    vim.notify("invalid command: " .. cmd, vim.log.levels.ERROR,
-      { title = "doing.nvim", })
+    do_cmds["add"](args.args, args.bang)
   end
 end, {
   nargs = "?",

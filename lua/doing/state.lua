@@ -1,3 +1,8 @@
+local dir_separator = "/"
+if vim.loop.os_uname().sysname:find("Windows")  then
+  dir_separator = "\\"
+end
+
 local State = {}
 
 ---@class DoingOptions
@@ -8,18 +13,33 @@ local State = {}
 ---@field store.file_name string name of the task file
 ---@field store.auto_delete_file boolean auto delete tasks file
 ---@field show_remaining boolean show "+n more" when there are more than 1 tasks
+---@field edit_win_config table<string, any> window configs of the floating editor
 
 State.default_opts = {
   message_timeout = 2000,
   doing_prefix = "Doing: ",
-  ignored_buffers = { "NvimTree", },
-  show_remaining = true,
 
-  winbar = {
-    enabled = true,
+  -- doesn"t display on buffers that match filetype/filename/filepath to
+  -- entries can be either a string array or a function that returns a
+  -- string array filepath can be relative or absolute
+  ignored_buffers = { "NvimTree", },
+
+  -- window configs of the floating tasks editor
+  -- see :h nvim_open_win() for available options
+  edit_win_config = {
+    width = 50,
+    height = 15,
+    border = "rounded",
   },
 
+  -- if should append "+n more" to the status when there are tasks remaining
+  show_remaining = true,
+
+  -- if plugin should manage the winbar
+  winbar = { enabled = false, },
+
   store = {
+    -- name of tasks file
     file_name = ".tasks",
   },
 }
@@ -55,18 +75,18 @@ end
 function State:create_file()
   local name = State.options.store.file_name
   local cwd = vim.fn.getcwd()
-  local file = io.open(cwd .. "/" .. name, "w")
+  local file = io.open(cwd .. dir_separator .. name, "w")
   assert(file, "couldn't create " .. name .. " in current cwd: " .. cwd)
 
   file:write("")
   file:close()
 
-  return cwd .. "/" .. name
+  return cwd .. dir_separator .. name
 end
 
 -- finds tasks file in cwd
 function State:import_file()
-  local file = vim.fn.findfile(vim.fn.getcwd() .. "/" .. State.options.store.file_name, ".;")
+  local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.options.store.file_name, ".;")
 
   if file == "" then
     self.file = nil

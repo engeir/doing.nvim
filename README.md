@@ -59,6 +59,14 @@ below
       -- if should append "+n more" to the status when there's tasks remaining
       show_remaining = true,
 
+      -- window configs of the floating tasks editor
+      -- see :h nvim_open_win() for available options
+      edit_win_config = {
+        width = 80,
+        height = 12,
+        border = "rounded",
+      }
+
       -- if plugin should manage the winbar
       winbar = { enabled = true, },
 
@@ -107,14 +115,14 @@ with heirline:
 
 ### Events
 
-This plugin exposes a custom event, for when a task is added or modified. You
-can use it like so:
+This plugin exposes a custom event, for when a task is added, edited or
+completed. You can use it like so:
 
 ```lua
 vim.api.nvim_create_autocmd({ "User" }, {
    group = require("doing.state").auGroupID,
    pattern = "TaskModified",
-   desc = "This is called when a task is added, edited or deleted",
+   desc = "This is called when a task is added, edited or completed",
    callback = function()
       vim.notify("A task has been modified")
    end,
@@ -129,6 +137,7 @@ with just notifications:
 ```lua
 {
   "Hashino/doing.nvim",
+  lazy = true,
   init = function()
     local doing = require("doing")
 
@@ -144,7 +153,7 @@ with just notifications:
     vim.api.nvim_create_autocmd({ "User", }, {
       group = require("doing.state").auGroupID,
       pattern = "TaskModified",
-      desc = "This is called when a task is added, edited or deleted",
+      desc = "This is called when a task is added, edited or completed",
       callback = function()
         vim.defer_fn(function()
           vim.notify(doing.status(), vim.log.levels.INFO)

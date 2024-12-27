@@ -65,7 +65,7 @@ below
         width = 80,
         height = 12,
         border = "rounded",
-      }
+      },
 
       -- if plugin should manage the winbar
       winbar = { enabled = true, },

@@ -32,7 +32,8 @@ function Utils.should_display()
      or vim.bo.buftype == "prompt"
      or vim.fn.win_gettype() ~= ""
   then
-    vim.b.doing_should_display = false -- saves result to a buffer variable
+    -- saves result to a buffer variable
+    vim.b.doing_should_display = false
     return false
   end
 
@@ -54,12 +55,14 @@ function Utils.should_display()
        or exclude == vim.fn.expand("%")            -- match filename
        or exclude:gsub("~", home_path_abs) == curr -- match filepath
     then
-      vim.b.doing_should_display = false           -- saves result to a buffer variable
+      -- saves result to a buffer variable
+      vim.b.doing_should_display = false
       return false
     end
   end
 
-  vim.b.doing_should_display = true -- saves result to a buffer variable
+  -- saves result to a buffer variable
+  vim.b.doing_should_display = true
   return true
 end
 

@@ -32,8 +32,7 @@ lazy.nvim:
 -- minimal installation
 {
   "Hashino/doing.nvim",
-  -- winbar won't load correctly if lazy loaded
-  config = true,
+  cmd = "Do", -- lazy loads on `:Do` command
 }
 ```
 
@@ -55,7 +54,7 @@ below
       -- doesn"t display on buffers that match filetype/filename/filepath to
       -- entries can be either a string array or a function that returns a
       -- string array filepath can be relative or absolute
-      ignored_buffers = { "NvimTree" }
+      ignored_buffers = { "NvimTree" },
 
       -- if should append "+n more" to the status when there's tasks remaining
       show_remaining = true,
@@ -130,18 +129,14 @@ with just notifications:
 ```lua
 {
   "Hashino/doing.nvim",
-  config = function()
-    require("doing").setup({
-      -- if plugin should manage the winbar
-      winbar = { enabled = false, },
-    })
-
+  init = function()
     local doing = require("doing")
 
     -- example keymaps
     vim.keymap.set("n", "<leader>da", doing.add, { desc = "[D]oing: [A]dd", })
     vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit", })
     vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e", })
+
     vim.keymap.set("n", "<leader>ds", function()
       vim.notify(doing.status(true), vim.log.levels.INFO)
     end, { desc = "[D]oing: [S]tatus", })
@@ -152,7 +147,7 @@ with just notifications:
       desc = "This is called when a task is added, edited or deleted",
       callback = function()
         vim.defer_fn(function()
-          vim.notify(doing.status(true), vim.log.levels.INFO)
+          vim.notify(doing.status(), vim.log.levels.INFO)
         end, 0)
       end,
     })

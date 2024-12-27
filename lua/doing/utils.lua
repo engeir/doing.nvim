@@ -44,7 +44,7 @@ function Utils.should_display()
 
   for _, exclude in ipairs(ignore) do
     -- checks if exclude is a relative filepath and expands it
-    if exclude:sub(1, 2) == "./" then
+    if exclude:sub(1, 2) == "./" or exclude:sub(1, 2) == ".\\" then
       exclude = vim.fn.getcwd() .. exclude:sub(2, -1)
       vim.notify(exclude)
     end

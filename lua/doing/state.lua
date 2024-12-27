@@ -1,3 +1,5 @@
+local dir_separator = vim.fn.has("win32") and "\\" or "/"
+
 local State = {}
 
 ---@class DoingOptions
@@ -61,18 +63,18 @@ end
 function State:create_file()
   local name = State.options.store.file_name
   local cwd = vim.fn.getcwd()
-  local file = io.open(cwd .. "/" .. name, "w")
+  local file = io.open(cwd .. dir_separator .. name, "w")
   assert(file, "couldn't create " .. name .. " in current cwd: " .. cwd)
 
   file:write("")
   file:close()
 
-  return cwd .. "/" .. name
+  return cwd .. dir_separator .. name
 end
 
 -- finds tasks file in cwd
 function State:import_file()
-  local file = vim.fn.findfile(vim.fn.getcwd() .. "/" .. State.options.store.file_name, ".;")
+  local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.options.store.file_name, ".;")
 
   if file == "" then
     self.file = nil

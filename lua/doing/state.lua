@@ -10,6 +10,7 @@ local State = {}
 ---@field store.file_name string name of the task file
 ---@field store.auto_delete_file boolean auto delete tasks file
 ---@field show_remaining boolean show "+n more" when there are more than 1 tasks
+---@field edit_win_config table<string, any> window configs of the floating editor
 
 State.default_opts = {
   message_timeout = 2000,
@@ -20,7 +21,15 @@ State.default_opts = {
   -- string array filepath can be relative or absolute
   ignored_buffers = { "NvimTree", },
 
-  -- if should append "+n more" to the status when there's tasks remaining
+  -- window configs of the floating tasks editor
+  -- see :h nvim_open_win() for available options
+  edit_win_config = {
+    width = 50,
+    height = 15,
+    border = "rounded",
+  },
+
+  -- if should append "+n more" to the status when there are tasks remaining
   show_remaining = true,
 
   -- if plugin should manage the winbar

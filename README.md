@@ -62,10 +62,10 @@ below
       -- window configs of the floating tasks editor
       -- see :h nvim_open_win() for available options
       edit_win_config = {
-        width = 80,
-        height = 12,
+        width = 50,
+        height = 15,
         border = "rounded",
-      },
+      }
 
       -- if plugin should manage the winbar
       winbar = { enabled = true, },

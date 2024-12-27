@@ -23,18 +23,29 @@ end
 local function get_floating_window()
   local bufnr = vim.api.nvim_create_buf(false, false)
 
-  local win_width = math.min(vim.opt.columns:get(), 80)
-  local win_height = math.min(vim.opt.lines:get(), 12)
+  local width = state.options.edit_win_config.width
+  local height = state.options.edit_win_config.height
 
-  local win = vim.api.nvim_open_win(bufnr, true, {
+  -- Get the current screen size
+  local screen_width = vim.o.columns
+  local screen_height = vim.o.lines
+
+  local default_win_config = {
+    width = width,
+    height = height,
+
     relative = "editor",
+    col = (screen_width / 2) - (width / 2),
+    row = (screen_height / 2) - (height / 2),
+
+    style = "minimal",
     border = "rounded",
-    noautocmd = false,
-    col = vim.opt.columns:get() / 2 - win_width / 2,
-    row = vim.opt.lines:get() / 2 - win_height / 2,
-    width = win_width,
-    height = win_height,
-  })
+
+    noautocmd = true,
+  }
+
+  local win = vim.api.nvim_open_win(bufnr, true,
+    vim.tbl_extend("force", default_win_config, state.options.edit_win_config))
 
   vim.api.nvim_set_option_value("winhl", "Normal:NormalFloat", {})
 

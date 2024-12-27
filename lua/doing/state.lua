@@ -1,4 +1,7 @@
-local dir_separator = vim.fn.has("win32") and "\\" or "/"
+local dir_separator = "/"
+if vim.loop.os_uname().sysname:find("Windows")  then
+  dir_separator = "\\"
+end
 
 local State = {}
 

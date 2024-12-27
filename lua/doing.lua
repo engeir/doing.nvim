@@ -36,7 +36,6 @@ function Doing.add(task, to_front)
     Doing.setup()
   end
 
-  state.tasks:sync()
   if task == nil then
     vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
       state.tasks:add(input, to_front)

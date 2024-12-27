@@ -12,14 +12,20 @@ local State = {}
 State.default_opts = {
   message_timeout = 2000,
   doing_prefix = "Doing: ",
+
+  -- doesn"t display on buffers that match filetype/filename/filepath to
+  -- entries can be either a string array or a function that returns a
+  -- string array filepath can be relative or absolute
   ignored_buffers = { "NvimTree", },
+
+  -- if should append "+n more" to the status when there's tasks remaining
   show_remaining = true,
 
-  winbar = {
-    enabled = true,
-  },
+  -- if plugin should manage the winbar
+  winbar = { enabled = false, },
 
   store = {
+    -- name of tasks file
     file_name = ".tasks",
   },
 }

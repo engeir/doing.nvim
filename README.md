@@ -84,6 +84,11 @@ below
     vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit" })
     vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e" })
     vim.keymap.set("n", "<leader>dt", doing.toggle, { desc = "[D]oing: [T]oggle" })
+
+    vim.keymap.set("n", "<leader>ds", function()
+      vim.notify(doing.status(true), vim.log.levels.INFO,
+        { title = "Doing:", icon = "", })
+    end, { desc = "[D]oing: [S]tatus", })
   end,
 }
 ```
@@ -147,7 +152,8 @@ with just notifications:
     vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e", })
 
     vim.keymap.set("n", "<leader>ds", function()
-      vim.notify(doing.status(true), vim.log.levels.INFO)
+      vim.notify(doing.status(true), vim.log.levels.INFO,
+        { title = "Doing:", icon = "", })
     end, { desc = "[D]oing: [S]tatus", })
 
     vim.api.nvim_create_autocmd({ "User", }, {
@@ -156,7 +162,11 @@ with just notifications:
       desc = "This is called when a task is added, edited or completed",
       callback = function()
         vim.defer_fn(function()
-          vim.notify(doing.status(), vim.log.levels.INFO)
+          local status = doing.status()
+          if status ~= "" then
+            vim.notify(status, vim.log.levels.INFO,
+              { title = "Doing:", icon = "", })
+          end
         end, 0)
       end,
     })

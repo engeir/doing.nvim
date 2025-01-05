@@ -1,5 +1,4 @@
 local config = require("doing.config")
-local state = require("doing.state")
 
 local Edit = {}
 
@@ -65,9 +64,9 @@ local function close_edit(callback)
 end
 
 ---@brief open floating window to edit tasks
----@param tasks table list of tasks
----@param callback function function to call when window is closed
-function Edit.open_edit(tasks, callback)
+---@param state table current state of doing.nvim
+---@param callback function callback to run after closing the window
+function Edit.open_edit(state, callback)
   if Edit.win then
     return close_edit()
   end
@@ -80,15 +79,16 @@ function Edit.open_edit(tasks, callback)
   vim.api.nvim_set_option_value("bufhidden", "delete", {})
   vim.api.nvim_buf_set_name(Edit.buf, "do-edit")
 
-  vim.api.nvim_buf_set_lines(Edit.buf, 0, #tasks, false, tasks)
+  vim.api.nvim_buf_set_lines(Edit.buf, 0, state.tasks:count(), false, state.tasks:get())
 
-  vim.keymap.set("n", "q", function()
-    close_edit(callback)
-  end, { buffer = Edit.buf, })
 
-  vim.keymap.set("n", "<Esc>", function()
-    close_edit(callback)
-  end, { buffer = Edit.buf, })
+  local function finish(new_todos)
+    state.tasks:set(new_todos)
+    callback()
+  end
+
+  vim.keymap.set("n", "q", function() close_edit(finish) end, { buffer = Edit.buf, })
+  vim.keymap.set("n", "<Esc>", function() close_edit(finish) end, { buffer = Edit.buf, })
 
   -- save tasks when buffer is written
   vim.api.nvim_create_autocmd("BufWriteCmd", {

@@ -59,10 +59,7 @@ function Doing.edit()
     Doing.setup()
   end
 
-  edit.open_edit(state.tasks:get(), function(new_todos)
-    state.tasks:set(new_todos)
-    utils.task_modified()
-  end)
+  edit.open_edit(state, utils.task_modified)
 end
 
 ---finish the current task

@@ -1,5 +1,5 @@
 local dir_separator = "/"
-if vim.loop.os_uname().sysname:find("Windows")  then
+if vim.loop.os_uname().sysname:find("Windows") then
   dir_separator = "\\"
 end
 
@@ -20,9 +20,12 @@ State.default_opts = {
   doing_prefix = "Doing: ",
 
   -- doesn"t display on buffers that match filetype/filename/filepath to
-  -- entries can be either a string array or a function that returns a
-  -- string array filepath can be relative or absolute
+  -- entries. can be either a string array or a function that returns a
+  -- string array. filepath can be relative to cwd or absolute
   ignored_buffers = { "NvimTree", },
+
+  -- if should append "+n more" to the status when there's tasks remaining
+  show_remaining = true,
 
   -- window configs of the floating tasks editor
   -- see :h nvim_open_win() for available options
@@ -32,11 +35,8 @@ State.default_opts = {
     border = "rounded",
   },
 
-  -- if should append "+n more" to the status when there are tasks remaining
-  show_remaining = true,
-
   -- if plugin should manage the winbar
-  winbar = { enabled = false, },
+  winbar = { enabled = true, },
 
   store = {
     -- name of tasks file
@@ -86,7 +86,8 @@ end
 
 -- finds tasks file in cwd
 function State:import_file()
-  local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.options.store.file_name, ".;")
+  local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.options.store.file_name,
+    ".;")
 
   if file == "" then
     self.file = nil

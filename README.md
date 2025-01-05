@@ -77,7 +77,7 @@ lazy.nvim:
         width = 50,
         height = 15,
         border = "rounded",
-      }
+      },
 
       -- if plugin should manage the winbar
       winbar = { enabled = true, },

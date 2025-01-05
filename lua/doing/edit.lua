@@ -1,3 +1,4 @@
+local config = require("doing.config")
 local state = require("doing.state")
 
 local global_win = nil
@@ -23,8 +24,8 @@ end
 local function get_floating_window()
   local bufnr = vim.api.nvim_create_buf(false, false)
 
-  local width = state.options.edit_win_config.width
-  local height = state.options.edit_win_config.height
+  local width = config.options.edit_win_config.width
+  local height = config.options.edit_win_config.height
 
   -- Get the current screen size
   local screen_width = vim.o.columns
@@ -45,7 +46,7 @@ local function get_floating_window()
   }
 
   local win = vim.api.nvim_open_win(bufnr, true,
-    vim.tbl_extend("force", default_win_config, state.options.edit_win_config))
+    vim.tbl_extend("force", default_win_config, config.options.edit_win_config))
 
   vim.api.nvim_set_option_value("winhl", "Normal:NormalFloat", {})
 
@@ -61,7 +62,10 @@ local function close_edit(callback)
     callback(get_buf_tasks())
   end
 
-  vim.api.nvim_win_close(0, true)
+  if global_win then
+    vim.api.nvim_win_close(global_win, true)
+  end
+
   global_win = nil
   global_buf = nil
 end

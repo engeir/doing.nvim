@@ -1,3 +1,4 @@
+local utils = require("doing.utils")
 local doing = require("doing")
 
 local do_cmds = {
@@ -7,8 +8,7 @@ local do_cmds = {
   ["toggle"] = doing.toggle,
 
   ["status"] = function()
-    vim.notify(doing.status(true), vim.log.levels.INFO,
-      { title = "doing.nvim", icon = "", })
+    utils.notify(doing.status(true))
   end,
 }
 

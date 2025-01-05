@@ -48,9 +48,9 @@ lazy.nvim:
 
 ## Configuration
 
-### Default Configs
+### Default Options
 
-[see the source code for default configs](https://github.com/Hashino/doing.nvim/blob/e4639e848b1503c14a591e3bfc6862560eeccefb/lua/doing/state.lua#L18-L45)
+[see the source code for default options](https://github.com/Hashino/doing.nvim/blob/main/lua/doing/config.lua)
 
 ### Example Config
 

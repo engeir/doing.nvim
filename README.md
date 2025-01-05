@@ -12,18 +12,28 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 ![doing](https://raw.githubusercontent.com/Hashino/doing.nvim/main/demo.gif)
 
-## Usage
+## Commands
 
-- `:Do add {task}` add a {task} to the end of the list
-- `:Do! add {task}` add a {task} to the front of list
+### Adding Tasks
+
+- `:Do add {task}` 
+- `:Do {task}`
+- `:Do "{task}"`
+
+will all add `{task}` to the end of the tasklist
+
+- `:Do! add {task}` 
+- `:Do! {task}`
+- `:Do! "{task}"`
+
+will all add `{task}` to the start of the tasklist
+
+### Other Commands
+
 - `:Do status` shows notification with current task/message (even if toggled off)
 - `:Do done` remove the first task from the list
 - `:Do edit` edit the tasklist in a floating window
 - `:Do toggle` toggle the display (winbar and status)
-
-> [!NOTE]
-> if the command is unrecognized it defaults to `add`. so `Do {task}` and
-> `Do! {task}` are equivalent to `Do add {task}` and `Do! add {task}`
 
 ## Installation
 
@@ -38,11 +48,13 @@ lazy.nvim:
 
 ## Configuration
 
-this plugin sets no keymaps by itself. an example on how to set them is given
-below
+### Default Configs
+
+[see the source code for default configs](https://github.com/Hashino/doing.nvim/blob/e4639e848b1503c14a591e3bfc6862560eeccefb/lua/doing/state.lua#L18-L45)
+
+### Example Config
 
 ```lua
--- example configuration
 {
   "Hashino/doing.nvim",
   config = function()
@@ -52,8 +64,8 @@ below
       doing_prefix = "Doing: ",
 
       -- doesn"t display on buffers that match filetype/filename/filepath to
-      -- entries can be either a string array or a function that returns a
-      -- string array filepath can be relative or absolute
+      -- entries. can be either a string array or a function that returns a
+      -- string array. filepath can be relative to cwd or absolute
       ignored_buffers = { "NvimTree" },
 
       -- if should append "+n more" to the status when there's tasks remaining

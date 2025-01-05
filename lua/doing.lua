@@ -36,14 +36,18 @@ function Doing.add(task, to_front)
     Doing.setup()
   end
 
-  if task == nil then
+  if task then
+    if task:sub(1,1) == '"' and task:sub(-1,-1) == '"' then
+      task = task:sub(2, -2)
+    end
+
+    state.tasks:add(task, to_front)
+    utils.task_modified()
+  else
     vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
       state.tasks:add(input, to_front)
       utils.task_modified()
     end)
-  else
-    state.tasks:add(task, to_front)
-    utils.task_modified()
   end
 end
 

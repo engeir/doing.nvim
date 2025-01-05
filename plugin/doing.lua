@@ -1,3 +1,4 @@
+local utils = require("doing.utils")
 local doing = require("doing")
 
 local do_cmds = {
@@ -7,8 +8,7 @@ local do_cmds = {
   ["toggle"] = doing.toggle,
 
   ["status"] = function()
-    vim.notify(doing.status(true), vim.log.levels.INFO,
-      { title = "doing.nvim", icon = "", })
+    utils.notify(doing.status(true))
   end,
 }
 
@@ -18,14 +18,16 @@ vim.api.nvim_create_user_command("Do", function(args)
   local cmd = args.args:sub(1, (args.args:find(" ") or (#args.args + 1)) - 1)
   local cmd_args = args.args:sub(#cmd + 2) or ""
 
+  -- checks if first argument is a Do command
   if vim.tbl_contains(vim.tbl_keys(do_cmds), cmd) then
     do_cmds[cmd](cmd_args, args.bang)
-  else
+  else -- otherwise, treat the the arguments as the task
     do_cmds["add"](args.args, args.bang)
   end
 end, {
   nargs = "?",
   bang = true,
+  -- sets up completion for the `:Do` command
   complete = function(_, cmd_line)
     local params = vim.split(cmd_line, "%s+", { trimempty = true, })
 

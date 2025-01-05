@@ -1,25 +1,26 @@
--- A tinier task manager that helps you stay on track.
-local state = require("doing.state")
-local utils = require("doing.utils")
-local edit  = require("doing.edit")
+local config = require("doing.config")
+local state  = require("doing.state")
+local utils  = require("doing.utils")
+local edit   = require("doing.edit")
 
-local Doing = {}
+local Doing  = {}
 
----setup doing.nvim
+---@brief setup doing.nvim
 ---@param opts? DoingOptions
 function Doing.setup(opts)
-  state.options = vim.tbl_deep_extend("force", state.default_opts, opts or {})
-  state.tasks = state.init(state.options.store)
+  config.options = vim.tbl_deep_extend("force", config.default_opts, opts or {})
+
+  state.tasks = state.init(config.options.store.file_name)
 
   -- doesn't touch the winbar if disabled so other plugins can manage
   -- it without interference
-  if state.options.winbar.enabled then
+  if config.options.winbar.enabled then
     state.auGroupID = vim.api.nvim_create_augroup("doing_nvim", { clear = true, })
 
     vim.api.nvim_create_autocmd({ "BufEnter", }, {
       group = state.auGroupID,
       callback = function()
-        -- gives time to process filetype
+        -- HACK: gives time to process filetype
         vim.defer_fn(function()
           utils.update_winbar()
         end, 100)
@@ -28,7 +29,7 @@ function Doing.setup(opts)
   end
 end
 
----add a task to the list
+---@brief add a task to the list
 ---@param task? string task to add
 ---@param to_front? boolean whether to add task to front of list
 function Doing.add(task, to_front)
@@ -36,8 +37,9 @@ function Doing.add(task, to_front)
     Doing.setup()
   end
 
-  if task then
-    if task:sub(1,1) == '"' and task:sub(-1,-1) == '"' then
+  if task ~= nil and task ~= "" then
+    -- remove quotes if present
+    if task:sub(1, 1) == '"' and task:sub(-1, -1) == '"' then
       task = task:sub(2, -2)
     end
 
@@ -70,11 +72,11 @@ function Doing.done()
   end
 
   if state.tasks:count() > 0 then
-    state.tasks:pop()
+    state.tasks:done()
 
     if state.tasks:count() == 0 then
       utils.show_message("All tasks done ")
-    elseif not state.options.show_remaining then
+    elseif not config.options.show_remaining then
       utils.show_message(state.tasks:count() .. " tasks left.")
     else
       utils.task_modified()
@@ -84,8 +86,8 @@ function Doing.done()
   end
 end
 
--- returns current plugin task/message
--- @param force boolean displays the message even if the plugin display is turned off
+---@param force? boolean return status even if the plugin is toggled off
+---@return string current current plugin task or message
 function Doing.status(force)
   if not state.tasks then
     Doing.setup()
@@ -99,11 +101,11 @@ function Doing.status(force)
       local count = state.tasks:count()
 
       -- append task count number if there is more than 1 task
-      if state.options.show_remaining and count > 1 then
+      if config.options.show_remaining and count > 1 then
         tasks_left = "  +" .. (state.tasks:count() - 1) .. " more"
       end
 
-      return state.options.doing_prefix .. state.tasks:current() .. tasks_left
+      return config.options.doing_prefix .. state.tasks:current() .. tasks_left
     elseif force then
       return "Not doing any tasks"
     end

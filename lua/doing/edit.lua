@@ -1,32 +1,36 @@
+local config = require("doing.config")
 local state = require("doing.state")
-
-local global_win = nil
-local global_buf = nil
 
 local Edit = {}
 
---- Get all the tasks currently in the pop up window
-local function get_buf_tasks()
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-  local indices = {}
+Edit.win = nil
+Edit.buf = nil
 
-  for _, line in pairs(lines) do
-    if line:gsub("%s", "") ~= "" then
-      table.insert(indices, line)
+---get a tasks table from the buffer lines
+local function get_buf_tasks()
+  local tasks = {}
+
+  if Edit.buf then
+    local lines = vim.api.nvim_buf_get_lines(Edit.buf, 0, -1, true)
+
+    for _, line in pairs(lines) do
+      -- checks if line is just spaces
+      if line:gsub("%s", "") ~= "" then
+        table.insert(tasks, line)
+      end
     end
   end
 
-  return indices
+  return tasks
 end
 
--- creates window
-local function get_floating_window()
-  local bufnr = vim.api.nvim_create_buf(false, false)
+---creates window
+local function setup_floating_window()
+  Edit.buf = vim.api.nvim_create_buf(false, false)
 
-  local width = state.options.edit_win_config.width
-  local height = state.options.edit_win_config.height
+  local width = config.options.edit_win_config.width
+  local height = config.options.edit_win_config.height
 
-  -- Get the current screen size
   local screen_width = vim.o.columns
   local screen_height = vim.o.lines
 
@@ -44,70 +48,55 @@ local function get_floating_window()
     noautocmd = true,
   }
 
-  local win = vim.api.nvim_open_win(bufnr, true,
-    vim.tbl_extend("force", default_win_config, state.options.edit_win_config))
-
-  vim.api.nvim_set_option_value("winhl", "Normal:NormalFloat", {})
-
-  return {
-    buf = bufnr,
-    win = win,
-  }
+  Edit.win = vim.api.nvim_open_win(Edit.buf, true,
+    vim.tbl_extend("force", default_win_config, config.options.edit_win_config))
 end
 
--- closes the window
+---closes the window
 local function close_edit(callback)
   if callback then
     callback(get_buf_tasks())
   end
 
-  vim.api.nvim_win_close(0, true)
-  global_win = nil
-  global_buf = nil
+  if Edit.win then
+    vim.api.nvim_win_close(Edit.win, true)
+    Edit.win = nil
+  end
 end
 
--- opens a float window to manage tasks
+---@brief open floating window to edit tasks
+---@param tasks table list of tasks
+---@param callback function function to call when window is closed
 function Edit.open_edit(tasks, callback)
-  if global_win ~= nil and vim.api.nvim_win_is_valid(global_win) then
-    close_edit()
-    return
+  if Edit.win then
+    return close_edit()
   end
 
-  local win_info = get_floating_window()
-  global_win = win_info.win
-  global_buf = win_info.buf
+  setup_floating_window()
 
   vim.api.nvim_set_option_value("number", true, {})
   vim.api.nvim_set_option_value("swapfile", false, {})
   vim.api.nvim_set_option_value("filetype", "doing_tasks", {})
-  vim.api.nvim_set_option_value("buftype", "acwrite", {})
   vim.api.nvim_set_option_value("bufhidden", "delete", {})
-  vim.api.nvim_buf_set_name(global_buf, "do-edit")
-  vim.api.nvim_buf_set_lines(global_buf, 0, #tasks, false, tasks)
+  vim.api.nvim_buf_set_name(Edit.buf, "do-edit")
+
+  vim.api.nvim_buf_set_lines(Edit.buf, 0, #tasks, false, tasks)
 
   vim.keymap.set("n", "q", function()
     close_edit(callback)
-  end, { buffer = global_buf, })
+  end, { buffer = Edit.buf, })
 
   vim.keymap.set("n", "<Esc>", function()
     close_edit(callback)
-  end, { buffer = global_buf, })
+  end, { buffer = Edit.buf, })
 
-  -- event after tasks from pop up has been written to
+  -- save tasks when buffer is written
   vim.api.nvim_create_autocmd("BufWriteCmd", {
     group = state.auGroupID,
-    buffer = global_buf,
+    buffer = Edit.buf,
     callback = function()
       local new_todos = get_buf_tasks()
       state.tasks:set(new_todos)
-    end,
-  })
-
-  vim.api.nvim_create_autocmd("BufModifiedSet", {
-    group = state.auGroupID,
-    buffer = global_buf,
-    callback = function()
-      vim.api.nvim_set_option_value("modified", false, {})
     end,
   })
 end

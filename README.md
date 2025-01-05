@@ -16,15 +16,17 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 ### Adding Tasks
 
-- `:Do add {task}` 
+- `:Do` will ask user input for `{task}`
 - `:Do {task}`
 - `:Do "{task}"`
+- `:Do add {task}` 
 
 will all add `{task}` to the end of the tasklist
 
-- `:Do! add {task}` 
+- `:Do!` will ask user input for `{task}`
 - `:Do! {task}`
 - `:Do! "{task}"`
+- `:Do! add {task}` 
 
 will all add `{task}` to the start of the tasklist
 
@@ -48,9 +50,9 @@ lazy.nvim:
 
 ## Configuration
 
-### Default Configs
+### Default Options
 
-[see the source code for default configs](https://github.com/Hashino/doing.nvim/blob/e4639e848b1503c14a591e3bfc6862560eeccefb/lua/doing/state.lua#L18-L45)
+[see the source code for default options](https://github.com/Hashino/doing.nvim/blob/main/lua/doing/config.lua)
 
 ### Example Config
 

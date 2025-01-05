@@ -1,19 +1,10 @@
-local state = require("doing.state")
+local config = require("doing.config")
 
 local Utils = {}
 
---- gets called when a task is added, edited, or removed
-function Utils.task_modified()
-  Utils.update_winbar()
-  vim.api.nvim_exec_autocmds("User", {
-    pattern = "TaskModified",
-    group = state.auGroupID,
-  })
-end
-
 ---redraw winbar depending on if there are tasks
 function Utils.update_winbar()
-  if state.options.winbar.enabled then
+  if config.options.winbar.enabled then
     vim.api.nvim_set_option_value("winbar", require("doing").status(),
       { scope = "local", })
   end
@@ -37,7 +28,7 @@ function Utils.should_display()
     return false
   end
 
-  local ignore = state.options.ignored_buffers
+  local ignore = config.options.ignored_buffers
   ignore = type(ignore) == "function" and ignore() or ignore
 
   local home_path_abs = tostring(os.getenv("HOME"))
@@ -47,7 +38,6 @@ function Utils.should_display()
     -- checks if exclude is a relative filepath and expands it
     if exclude:sub(1, 2) == "./" or exclude:sub(1, 2) == ".\\" then
       exclude = vim.fn.getcwd() .. exclude:sub(2, -1)
-      vim.notify(exclude)
     end
 
     if
@@ -66,17 +56,43 @@ function Utils.should_display()
   return true
 end
 
---- show a message for the duration of `options.message_timeout` or timeout
+---gets called when a task is added, edited, or removed
+function Utils.task_modified()
+  Utils.update_winbar()
+  vim.api.nvim_exec_autocmds("User", {
+    pattern = "TaskModified",
+    group = require("doing.state").auGroupID,
+  })
+end
+
+---@brief show a message for the duration of `options.message_timeout` or timeout
 ---@param str string message to show
 ---@param timeout? number time in ms to show message
 function Utils.show_message(str, timeout)
-  state.message = str
+  require("doing.state").message = str
   Utils.task_modified()
 
   vim.defer_fn(function()
-    state.message = nil
+    require("doing.state").message = nil
     Utils.task_modified()
-  end, timeout or state.options.message_timeout)
+  end, timeout or config.options.message_timeout)
+end
+
+function Utils.get_path_separator()
+  local dir_separator = "/"
+  if (vim.loop or vim.uv).os_uname().sysname:find("Windows") then
+    dir_separator = "\\"
+  end
+
+  return dir_separator
+end
+
+---@brief calls vim.notify with a title and icon
+---@param msg string the message to show
+---@param log_level? integer the log level to show
+function Utils.notify(msg, log_level)
+  vim.notify(msg, log_level or vim.log.levels.OFF,
+    { title = "doing.nvim", icon = "", })
 end
 
 return Utils

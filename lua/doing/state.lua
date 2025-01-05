@@ -1,79 +1,41 @@
-local dir_separator = "/"
-if vim.loop.os_uname().sysname:find("Windows") then
-  dir_separator = "\\"
-end
+local utils = require("doing.utils")
+local dir_separator = utils.get_path_separator()
 
 local State = {}
 
----@class DoingOptions
----@field ignored_buffers string[]|fun():string[] elements of the array are checked against buffer filename/filetype
----@field message_timeout integer how many millisecons messages will stay on screen
----@field doing_prefix string prefix to show before the task
----@field winbar.enabled boolean if plugin should manage the winbar
----@field store.file_name string name of the task file
----@field store.auto_delete_file boolean auto delete tasks file
----@field show_remaining boolean show "+n more" when there are more than 1 tasks
----@field edit_win_config table<string, any> window configs of the floating editor
-
-State.default_opts = {
-  message_timeout = 2000,
-  doing_prefix = "Doing: ",
-
-  -- doesn"t display on buffers that match filetype/filename/filepath to
-  -- entries. can be either a string array or a function that returns a
-  -- string array. filepath can be relative to cwd or absolute
-  ignored_buffers = { "NvimTree", },
-
-  -- if should append "+n more" to the status when there's tasks remaining
-  show_remaining = true,
-
-  -- window configs of the floating tasks editor
-  -- see :h nvim_open_win() for available options
-  edit_win_config = {
-    width = 50,
-    height = 15,
-    border = "rounded",
-  },
-
-  -- if plugin should manage the winbar
-  winbar = { enabled = true, },
-
-  store = {
-    -- name of tasks file
-    file_name = ".tasks",
-  },
-}
-
-State.view_enabled = true
+State.file_name = nil
 State.tasks = nil
 State.message = nil
+State.view_enabled = true
 State.auGroupID = nil
-State.options = State.default_opts
 
----initialize task store
-State.init = function(options)
+---@brief initialzes the tasklist state
+---@param file_name string name of the file to store tasks
+---@return table instance instantiated state
+function State.init(file_name)
+  State.file_name = file_name
+
   local default_state = {
-    options = options,
     file = nil,
     tasks = {},
   }
 
   local instance = setmetatable(default_state, { __index = State, })
 
-  local state = require("doing.state")
   vim.api.nvim_create_autocmd("DirChanged", {
-    group = state.auGroupID,
+    group = State.auGroupID,
     callback = function()
-      state.tasks = State.init(state.options.store)
+      State.tasks = State.init(file_name)
     end,
   })
+
   instance.tasks = instance:import_file() or {}
   return instance
 end
 
--- creates a file based on configs
+---creates a file based on configs
 function State:create_file()
-  local name = State.options.store.file_name
+  local name = State.file_name
   local cwd = vim.fn.getcwd()
   local file = io.open(cwd .. dir_separator .. name, "w")
   assert(file, "couldn't create " .. name .. " in current cwd: " .. cwd)
@@ -84,9 +46,9 @@ function State:create_file()
   return cwd .. dir_separator .. name
 end
 
--- finds tasks file in cwd
+---finds tasks file in cwd
 function State:import_file()
-  local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.options.store.file_name,
+  local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.file_name,
     ".;")
 
   if file == "" then
@@ -106,13 +68,12 @@ local function delete_file(file_path)
     local success, err, err_name = (vim.uv or vim.loop).fs_unlink(file_path)
 
     if not success then
-      vim.notify(tostring(err_name) .. ":" .. tostring(err),
-        vim.log.levels.ERROR, { title = "doing.nvim: error deleting tasks file", })
+      utils.notify(tostring(err_name) .. ":" .. tostring(err), vim.log.levels.ERROR)
     end
   end)()
 end
 
--- syncs file tasks with loaded tasks. creates file if force == true
+---syncs file tasks with loaded tasks. creates file if force == true
 function State:sync()
   if (not self.file) and #self.tasks > 0 then
     self.file = self:create_file()
@@ -123,8 +84,7 @@ function State:sync()
   if self.file and vim.fn.filewritable(self.file) and self.tasks ~= {} then
     local res = vim.fn.writefile(self.tasks, self.file)
     if res ~= 0 then
-      vim.notify("error writing to tasks file",
-        vim.log.levels.ERROR, { title = "doing.nvim", })
+      utils.notify("error writing to tasks file", vim.log.levels.ERROR)
     end
   end
 
@@ -158,7 +118,7 @@ function State:add(str, to_front)
   return self:sync()
 end
 
-function State:pop()
+function State:done()
   return table.remove(self.tasks, 1), self:sync()
 end
 

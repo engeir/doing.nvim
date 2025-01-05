@@ -59,7 +59,7 @@ function Doing.edit()
     Doing.setup()
   end
 
-  edit.open_edit(state, utils.task_modified)
+  edit.open_edit(state)
 end
 
 ---finish the current task

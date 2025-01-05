@@ -8,7 +8,7 @@ local Config = {}
 ---@field store.file_name string name of the task file
 ---@field store.auto_delete_file boolean auto delete tasks file
 ---@field show_remaining boolean show "+n more" when there are more than 1 tasks
----@field edit_win_config table<string, any> window configs of the floating editor
+---@field edit_win_config vim.api.keyset.win_config window configs of the floating editor
 
 Config.default_opts = {
   message_timeout = 2000,
@@ -27,7 +27,15 @@ Config.default_opts = {
   edit_win_config = {
     width = 50,
     height = 15,
+
+    relative = "editor",
+    col = (vim.o.columns / 2) - (50 / 2),
+    row = (vim.o.lines / 2) - (15 / 2),
+
+    style = "minimal",
     border = "rounded",
+
+    noautocmd = true,
   },
 
   -- if plugin should manage the winbar

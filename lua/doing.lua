@@ -5,7 +5,7 @@ local edit   = require("doing.edit")
 
 local Doing  = {}
 
----setup doing.nvim
+---@brief setup doing.nvim
 ---@param opts? DoingOptions
 function Doing.setup(opts)
   config.options = vim.tbl_deep_extend("force", config.default_opts, opts or {})
@@ -20,7 +20,7 @@ function Doing.setup(opts)
     vim.api.nvim_create_autocmd({ "BufEnter", }, {
       group = state.auGroupID,
       callback = function()
-        -- gives time to process filetype
+        -- HACK: gives time to process filetype
         vim.defer_fn(function()
           utils.update_winbar()
         end, 100)
@@ -29,7 +29,7 @@ function Doing.setup(opts)
   end
 end
 
----add a task to the list
+---@brief add a task to the list
 ---@param task? string task to add
 ---@param to_front? boolean whether to add task to front of list
 function Doing.add(task, to_front)
@@ -72,7 +72,7 @@ function Doing.done()
   end
 
   if state.tasks:count() > 0 then
-    state.tasks:pop()
+    state.tasks:done()
 
     if state.tasks:count() == 0 then
       utils.show_message("All tasks done ")
@@ -86,8 +86,8 @@ function Doing.done()
   end
 end
 
--- returns current plugin task/message
--- @param force boolean displays the message even if the plugin display is turned off
+---@param force? boolean return status even if the plugin is toggled off
+---@return string current current plugin task or message
 function Doing.status(force)
   if not state.tasks then
     Doing.setup()

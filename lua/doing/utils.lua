@@ -56,7 +56,7 @@ function Utils.should_display()
   return true
 end
 
---- gets called when a task is added, edited, or removed
+---gets called when a task is added, edited, or removed
 function Utils.task_modified()
   Utils.update_winbar()
   vim.api.nvim_exec_autocmds("User", {
@@ -65,7 +65,7 @@ function Utils.task_modified()
   })
 end
 
---- show a message for the duration of `options.message_timeout` or timeout
+---@brief show a message for the duration of `options.message_timeout` or timeout
 ---@param str string message to show
 ---@param timeout? number time in ms to show message
 function Utils.show_message(str, timeout)
@@ -80,15 +80,18 @@ end
 
 function Utils.get_path_separator()
   local dir_separator = "/"
-  if vim.loop.os_uname().sysname:find("Windows") then
+  if (vim.loop or vim.uv).os_uname().sysname:find("Windows") then
     dir_separator = "\\"
   end
 
   return dir_separator
 end
 
+---@brief calls vim.notify with a title and icon
+---@param msg string the message to show
+---@param log_level? integer the log level to show
 function Utils.notify(msg, log_level)
-  vim.notify(msg, log_level or vim.log.levels.INFO,
+  vim.notify(msg, log_level or vim.log.levels.OFF,
     { title = "doing.nvim", icon = "", })
 end
 

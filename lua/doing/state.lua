@@ -9,8 +9,10 @@ State.message = nil
 State.view_enabled = true
 State.auGroupID = nil
 
----initialize task store
-State.init = function(file_name)
+---@brief initialzes the tasklist state
+---@param file_name string name of the file to store tasks
+---@return table instance instantiated state
+function State.init(file_name)
   State.file_name = file_name
 
   local default_state = {
@@ -31,7 +33,7 @@ State.init = function(file_name)
   return instance
 end
 
--- creates a file based on configs
+---creates a file based on configs
 function State:create_file()
   local name = State.file_name
   local cwd = vim.fn.getcwd()
@@ -44,7 +46,7 @@ function State:create_file()
   return cwd .. dir_separator .. name
 end
 
--- finds tasks file in cwd
+---finds tasks file in cwd
 function State:import_file()
   local file = vim.fn.findfile(vim.fn.getcwd() .. dir_separator .. State.file_name,
     ".;")
@@ -71,7 +73,7 @@ local function delete_file(file_path)
   end)()
 end
 
--- syncs file tasks with loaded tasks. creates file if force == true
+---syncs file tasks with loaded tasks. creates file if force == true
 function State:sync()
   if (not self.file) and #self.tasks > 0 then
     self.file = self:create_file()
@@ -116,7 +118,7 @@ function State:add(str, to_front)
   return self:sync()
 end
 
-function State:pop()
+function State:done()
   return table.remove(self.tasks, 1), self:sync()
 end
 

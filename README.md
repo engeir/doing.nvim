@@ -16,15 +16,17 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 ### Adding Tasks
 
-- `:Do add {task}` 
+- `:Do` will ask user input for `{task}`
 - `:Do {task}`
 - `:Do "{task}"`
+- `:Do add {task}` 
 
 will all add `{task}` to the end of the tasklist
 
-- `:Do! add {task}` 
+- `:Do!` will ask user input for `{task}`
 - `:Do! {task}`
 - `:Do! "{task}"`
+- `:Do! add {task}` 
 
 will all add `{task}` to the start of the tasklist
 

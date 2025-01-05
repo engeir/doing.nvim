@@ -37,7 +37,8 @@ function Doing.add(task, to_front)
     Doing.setup()
   end
 
-  if task then
+  if task ~= nil and task ~= "" then
+    -- remove quotes if present
     if task:sub(1, 1) == '"' and task:sub(-1, -1) == '"' then
       task = task:sub(2, -2)
     end

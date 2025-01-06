@@ -17,7 +17,15 @@ function Edit.open_edit(state)
       group = state.auGroupID,
       buffer = Edit.buf,
       callback = function()
-        state.tasks:set(vim.api.nvim_buf_get_lines(Edit.buf, 0, -1, true))
+        local lines = vim.api.nvim_buf_get_lines(Edit.buf, 0, -1, true)
+
+        for i, line in ipairs(lines) do
+          if line == "" then
+            table.remove(lines, i)
+          end
+        end
+
+        state.tasks:set(lines)
         utils.task_modified()
       end,
     })

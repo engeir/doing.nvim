@@ -22,6 +22,14 @@ Config.default_opts = {
   -- if should append "+n more" to the status when there's tasks remaining
   show_remaining = true,
 
+  winbar = {
+    enabled = true, -- if plugin should manage the winbar
+  },
+
+  store = {
+    file_name = ".tasks", -- name of tasks file
+  },
+
   -- window configs of the floating tasks editor
   -- see :h nvim_open_win() for available options
   edit_win_config = {
@@ -36,14 +44,6 @@ Config.default_opts = {
     border = "rounded",
 
     noautocmd = true,
-  },
-
-  -- if plugin should manage the winbar
-  winbar = { enabled = true, },
-
-  store = {
-    -- name of tasks file
-    file_name = ".tasks",
   },
 }
 

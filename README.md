@@ -81,6 +81,9 @@ lazy.nvim:
       -- if should append "+n more" to the status when there's tasks remaining
       show_remaining = true,
 
+      -- if should show messages on the status string
+      show_messages = true,
+
       -- window configs of the floating tasks editor
       -- see :h nvim_open_win() for available options
       edit_win_config = {

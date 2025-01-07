@@ -9,7 +9,7 @@ State.message = nil
 State.view_enabled = true
 State.auGroupID = nil
 
----@brief initialzes the tasklist state
+--- initialzes the tasklist state
 ---@param file_name string name of the file to store tasks
 ---@return table instance instantiated state
 function State.init(file_name)

@@ -5,7 +5,7 @@ local edit   = require("doing.edit")
 
 local Doing  = {}
 
----@brief setup doing.nvim
+--- setup doing.nvim
 ---@param opts? DoingOptions
 function Doing.setup(opts)
   config.options = vim.tbl_deep_extend("force", config.default_opts, opts or {})
@@ -29,7 +29,7 @@ function Doing.setup(opts)
   end
 end
 
----@brief add a task to the list
+--- add a task to the list
 ---@param task? string task to add
 ---@param to_front? boolean whether to add task to front of list
 function Doing.add(task, to_front)
@@ -114,6 +114,11 @@ end
 function Doing.toggle()
   state.view_enabled = not state.view_enabled
   utils.task_modified()
+end
+
+---@return integer number of tasks left
+function Doing.tasks_left()
+  return state.tasks:count()
 end
 
 return Doing

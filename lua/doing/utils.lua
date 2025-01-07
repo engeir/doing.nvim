@@ -65,17 +65,21 @@ function Utils.task_modified()
   })
 end
 
----@brief show a message for the duration of `options.message_timeout` or timeout
+--- show a message for the duration of `options.message_timeout` or timeout
 ---@param str string message to show
 ---@param timeout? number time in ms to show message
 function Utils.show_message(str, timeout)
-  require("doing.state").message = str
-  Utils.task_modified()
-
-  vim.defer_fn(function()
-    require("doing.state").message = nil
+  if config.options.show_messages then
+    require("doing.state").message = str
     Utils.task_modified()
-  end, timeout or config.options.message_timeout)
+
+    vim.defer_fn(function()
+      require("doing.state").message = nil
+      Utils.task_modified()
+    end, timeout or config.options.message_timeout)
+  else
+    Utils.task_modified()
+  end
 end
 
 function Utils.get_path_separator()
@@ -87,7 +91,7 @@ function Utils.get_path_separator()
   return dir_separator
 end
 
----@brief calls vim.notify with a title and icon
+--- calls vim.notify with a title and icon
 ---@param msg string the message to show
 ---@param log_level? integer the log level to show
 function Utils.notify(msg, log_level)

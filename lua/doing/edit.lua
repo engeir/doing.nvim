@@ -6,7 +6,7 @@ local Edit = {
   buf = nil,
 }
 
----@brief open floating window to edit tasks
+--- open floating window to edit tasks
 ---@param state table current state of doing.nvim
 function Edit.open_edit(state)
   if not Edit.buf then

@@ -7,6 +7,7 @@ local Config = {}
 ---@field winbar.enabled boolean if plugin should manage the winbar
 ---@field store.file_name string name of the task file
 ---@field store.auto_delete_file boolean auto delete tasks file
+---@field show_messages boolean show messages in status string
 ---@field show_remaining boolean show "+n more" when there are more than 1 tasks
 ---@field edit_win_config vim.api.keyset.win_config window configs of the floating editor
 
@@ -21,6 +22,9 @@ Config.default_opts = {
 
   -- if should append "+n more" to the status when there's tasks remaining
   show_remaining = true,
+
+  -- if should show messages on the status string
+  show_messages = true,
 
   winbar = {
     enabled = true, -- if plugin should manage the winbar

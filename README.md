@@ -11,10 +11,11 @@
   <img src="https://dotfyle.com/plugins/Hashino/doing.nvim/shield"/>
 </a>
 
-A tiny task manager within neovim that helps you stay on track by keeping a stack
-of tasks and always showing the first task and how many more you have.
+A minimal task manager for neovim. Works by keeping a stack of strings stored in
+plain text file and offering some ways of displaying those tasks.
 
-It works by storing the tasks in a plain text file
+This plugin is meant to be very small, simple to use and performant. If you want
+a more featureful task manager, check out [todotxt.nvim](https://github.com/arnarg/todotxt.nvim).
 
 this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocksock/do.nvim)
 

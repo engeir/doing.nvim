@@ -33,8 +33,6 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 *will all add `{task}` to the end of the tasklist*
 
----
-
 - `:Do!` will prompt user input for `{task}`
 - `:Do! {task}`
 - `:Do! "{task}"`
@@ -42,14 +40,10 @@ this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocks
 
 *will all add `{task}` to the start of the tasklist*
 
----
-
 - `:Done`
 - `:Do done`
 
 *will both remove the current task from the list* 
-
----
 
 ### Other Commands
 
@@ -163,7 +157,6 @@ completed. You can use it like so:
 
 ```lua
 vim.api.nvim_create_autocmd({ "User" }, {
-   group = require("doing.state").auGroupID,
    pattern = "TaskModified",
    desc = "This is called when a task is added, edited or completed",
    callback = function()
@@ -195,7 +188,6 @@ If your winbar is already in use and your status bar is full, you can use
     end, { desc = "[D]oing: [S]tatus", })
 
     vim.api.nvim_create_autocmd({ "User", }, {
-      group = require("doing.state").auGroupID,
       pattern = "TaskModified",
       desc = "This is called when a task is added, edited or completed",
       callback = function()

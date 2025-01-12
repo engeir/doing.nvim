@@ -5,8 +5,9 @@ local Utils = {}
 ---redraw winbar depending on if there are tasks
 function Utils.update_winbar()
   if config.options.winbar.enabled then
-    vim.api.nvim_set_option_value("winbar", require("doing").status(),
-      { scope = "local", })
+    local status = require("doing").status()
+    vim.notify(status)
+    vim.api.nvim_set_option_value("winbar", status, { scope = "local", })
   end
 end
 
@@ -62,7 +63,6 @@ function Utils.task_modified()
   Utils.update_winbar()
   vim.api.nvim_exec_autocmds("User", {
     pattern = "TaskModified",
-    group = require("doing.state").auGroupID,
   })
 end
 

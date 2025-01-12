@@ -11,8 +11,8 @@ local Config = {}
 ---@field show_remaining boolean show "+n more" when there are more than 1 tasks
 ---@field edit_win_config vim.api.keyset.win_config window configs of the floating editor
 
+---@class DoingOptions
 Config.default_opts = {
-  message_timeout = 2000,
   doing_prefix = "Doing: ",
 
   -- doesn"t display on buffers that match filetype/filename/filepath to
@@ -24,7 +24,10 @@ Config.default_opts = {
   show_remaining = true,
 
   -- if should show messages on the status string
+  -- if true, the status will show a message for the duration 
+  -- of message_timeout in the status string
   show_messages = true,
+  message_timeout = 2000,
 
   winbar = {
     enabled = true, -- if plugin should manage the winbar

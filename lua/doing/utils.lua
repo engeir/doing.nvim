@@ -34,6 +34,7 @@ function Utils.should_display()
   local home_path_abs = tostring(os.getenv("HOME"))
   local curr = vim.fn.expand("%:p")
 
+  ---@diagnostic disable-next-line: param-type-mismatch
   for _, exclude in ipairs(ignore) do
     -- checks if exclude is a relative filepath and expands it
     if exclude:sub(1, 2) == "./" or exclude:sub(1, 2) == ".\\" then
@@ -91,9 +92,9 @@ function Utils.get_path_separator()
   return dir_separator
 end
 
---- calls vim.notify with a title and icon
+--- calls vim.notify with a styled title and icon
 ---@param msg string the message to show
----@param log_level? integer the log level to show
+---@param log_level? integer One of the values from |vim.log.levels|.
 function Utils.notify(msg, log_level)
   vim.notify(msg, log_level or vim.log.levels.OFF,
     { title = "doing.nvim", icon = "", })

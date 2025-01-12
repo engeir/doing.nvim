@@ -9,16 +9,8 @@ State.message = nil
 State.view_enabled = true
 State.file_name = config.options.store.file_name
 
-vim.api.nvim_create_autocmd("DirChanged", {
-  callback = function()
-    State.tasks = State.import_file()
-    utils.task_modified()
-  end,
-})
-
 ---finds tasks file in cwd
----@return string[]|nil tasks tasklist or nil if file not found
-function State.import_file()
+local function import_file()
   local file = vim.fn.findfile(vim.fn.getcwd() .. separator .. State.file_name, ".;")
 
   if file == "" then
@@ -31,8 +23,17 @@ function State.import_file()
   return State.file and vim.fn.readfile(State.file) or {}
 end
 
+State.tasks = import_file()
+
+vim.api.nvim_create_autocmd("DirChanged", {
+  callback = function()
+    State.tasks = import_file()
+    utils.task_modified()
+  end,
+})
+
 ---syncs file tasks with loaded tasks
-function State.sync()
+local function sync()
   if (not State.file) and #State.tasks > 0 then
     -- if file doesn't exist and there are tasks, create it
     local name = State.file_name
@@ -60,11 +61,6 @@ function State.sync()
   end
 end
 
-function State.set(tasks)
-  State.tasks = tasks
-  State.sync()
-end
-
 function State.add(str, to_front)
   if to_front then
     table.insert(State.tasks, 1, str)
@@ -72,17 +68,17 @@ function State.add(str, to_front)
     table.insert(State.tasks, str)
   end
 
-  State.sync()
+  sync()
 end
 
 function State.done()
   table.remove(State.tasks, 1)
-  State.sync()
+  sync()
 end
 
--- for lazy loading
-if not State.tasks then
-  State.tasks = State.import_file()
+function State.set(tasks)
+  State.tasks = tasks
+  sync()
 end
 
 return State

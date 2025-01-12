@@ -15,7 +15,7 @@ end
 function Utils.should_display()
   -- once a window gets checked once, a variable is set to tell doing
   -- if it should render itself in it
-  -- this avoids redoing the cheking on every update
+  -- this avoids redoing the checking on every update
   if vim.b.doing_should_display then
     return vim.b.doing_should_display
   end

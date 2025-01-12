@@ -25,8 +25,8 @@ function Edit.open_edit(state)
           end
         end
 
-        state.tasks:set(lines)
-        utils.task_modified()
+        state.set(lines)
+        vim.defer_fn( utils.task_modified , 0)
       end,
     })
   end
@@ -40,7 +40,7 @@ function Edit.open_edit(state)
     vim.api.nvim_set_option_value("bufhidden", "delete", { buf = Edit.buf, })
   end
 
-  vim.api.nvim_buf_set_lines(Edit.buf, 0, state.tasks:count(), false, state.tasks:get())
+  vim.api.nvim_buf_set_lines(Edit.buf, 0, #state.tasks, false, state.tasks)
 
   ---closes the window, sets the task and calls task_modified
   local function close_edit()

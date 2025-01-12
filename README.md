@@ -15,35 +15,45 @@ A minimal task manager for neovim. Works by keeping a stack of strings stored in
 plain text file and offering some ways of displaying those tasks.
 
 This plugin is meant to be very small, simple to use and performant. If you want
-a more featureful task manager, check out [todotxt.nvim](https://github.com/arnarg/todotxt.nvim).
+a more featureful task manager, check out [todotxt.nvim](https://github.com/arnarg/todotxt.nvim) and [dooing](https://github.com/atiladefreitas/dooing).
 
 this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocksock/do.nvim)
 
 ![doing](https://raw.githubusercontent.com/Hashino/doing.nvim/main/demo.gif)
-*the gif was recorded using a [custom heirline component](https://github.com/Hashino/hash.nvim/blob/be72be47cb150019ce585a7c0f9e0060db0de76d/lua/hash/plugins/interface/status-bar.lua#L176-L222)*
+*the gif was recorded using a [custom heirline component](https://github.com/Hashino/hash.nvim/blob/16d5a2af48b793808ee6d7daac0b8d6698faaa14/lua/hash/plugins/interface/status-bar.lua#L176-L221)*
 
 ## Commands
 
-### Adding Tasks
+### Adding/Removing Tasks
 
 - `:Do` will prompt user input for `{task}`
 - `:Do {task}`
 - `:Do "{task}"`
 - `:Do add {task}` 
 
-will all add `{task}` to the end of the tasklist
+*will all add `{task}` to the end of the tasklist*
+
+---
 
 - `:Do!` will prompt user input for `{task}`
 - `:Do! {task}`
 - `:Do! "{task}"`
 - `:Do! add {task}` 
 
-will all add `{task}` to the start of the tasklist
+*will all add `{task}` to the start of the tasklist*
+
+---
+
+- `:Done`
+- `:Do done`
+
+*will both remove the current task from the list* 
+
+---
 
 ### Other Commands
 
-- `:Do status` shows notification with current task/message (even if toggled off)
-- `:Do done` remove the first task from the list
+- `:Do status` shows notification with current task/message
 - `:Do edit` edit the tasklist in a floating window
 - `:Do toggle` toggle the display (winbar and status)
 
@@ -139,7 +149,8 @@ with heirline:
 ```lua
 {
   provider = function()
-    return " " .. require("doing").status() .. " "
+    local doing = require("doing")
+    return " " .. doing.status() .. " +" .. tostring(doing.tasks_left())
   end,
   update = { "BufEnter", "User", pattern = "TaskModified", },
 },
@@ -163,8 +174,8 @@ vim.api.nvim_create_autocmd({ "User" }, {
 
 ### Recipes
 
-If your winbar is already in use and your status bar is full, you can use doing
-with just notifications:
+If your winbar is already in use and your status bar is full, you can use
+`doing` with just notifications:
 
 ```lua
 {

@@ -19,6 +19,7 @@ It works by storing the tasks in a plain text file
 this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocksock/do.nvim)
 
 ![doing](https://raw.githubusercontent.com/Hashino/doing.nvim/main/demo.gif)
+*the gif was recorded using a [custom heirline component](https://github.com/Hashino/hash.nvim/blob/be72be47cb150019ce585a7c0f9e0060db0de76d/lua/hash/plugins/interface/status-bar.lua#L176-L222)*
 
 ## Commands
 

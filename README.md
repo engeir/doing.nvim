@@ -19,6 +19,7 @@ It works by storing the tasks in a plain text file
 this plugin was originally a fork of [nocksock/do.nvim](https://github.com/nocksock/do.nvim)
 
 ![doing](https://raw.githubusercontent.com/Hashino/doing.nvim/main/demo.gif)
+*the gif was recorded using a [custom heirline component](https://github.com/Hashino/hash.nvim/blob/be72be47cb150019ce585a7c0f9e0060db0de76d/lua/hash/plugins/interface/status-bar.lua#L176-L222)*
 
 ## Commands
 
@@ -80,6 +81,9 @@ lazy.nvim:
 
       -- if should append "+n more" to the status when there's tasks remaining
       show_remaining = true,
+
+      -- if should show messages on the status string
+      show_messages = true,
 
       -- window configs of the floating tasks editor
       -- see :h nvim_open_win() for available options

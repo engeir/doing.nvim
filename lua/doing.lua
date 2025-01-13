@@ -46,7 +46,7 @@ end
 
 ---edit the tasks in a floating window
 function Doing.edit()
-  edit.open_edit(state)
+  edit.open_edit()
 end
 
 ---finish the current task

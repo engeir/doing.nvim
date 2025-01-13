@@ -18,7 +18,7 @@ vim.api.nvim_create_autocmd({ "DirChanged", "VimEnter", }, {
 
     local ok, res = pcall(vim.fn.readfile, tasks_file)
     State.tasks = ok and res or {}
-    utils.task_modified()
+    State.task_modified()
   end,
 })
 
@@ -36,7 +36,9 @@ local function sync()
     end)()
   end
 
-  if #State.tasks > 0 and not vim.fn.writefile(State.tasks, tasks_file) then
+  local ok = pcall(vim.fn.writefile, State.tasks, tasks_file)
+
+  if #State.tasks > 0 and not ok then
     utils.notify("error writing to tasks file", vim.log.levels.ERROR)
   end
 end
@@ -45,19 +47,71 @@ if not config.options.store.sync_tasks then
   vim.api.nvim_create_autocmd("VimLeave", { callback = sync, })
 end
 
-function State.add(str, to_front)
-  table.insert(State.tasks, to_front and 1 or #State.tasks, str)
+---@param force? boolean return status even if the plugin is toggled off
+---@return string current current plugin task or message
+function State.status(force)
+  if (State.view_enabled or force) and utils.should_display() then
+    local count = #State.tasks or 0
+    if State.message then
+      return State.message
+    elseif count > 0 then
+      local tasks_left = ""
+
+      -- append task count number if there is more than 1 task
+      if config.options.show_remaining and count > 1 then
+        tasks_left = "  +" .. (count - 1) .. " more"
+      end
+
+      return config.options.doing_prefix .. State.tasks[1] .. tasks_left
+    elseif force then
+      return "Not doing any tasks"
+    end
+  end
+  return ""
+end
+
+---show a message for the duration of `options.message_timeout` or timeout
+---@param str string message to show
+---@param timeout? number time in ms to show message
+function State.show_message(str, timeout)
+  if config.options.show_messages then
+    State.message = str
+    State.task_modified()
+
+    vim.defer_fn(function()
+      State.message = nil
+      State.task_modified()
+    end, timeout or config.options.message_timeout)
+  else
+    State.task_modified()
+  end
+end
+
+---gets called when a task is added, edited, or removed
+function State.task_modified()
+  if config.options.winbar.enabled then
+    vim.api.nvim_set_option_value("winbar", State.status(), { scope = "local", })
+  end
+
+  vim.api.nvim_exec_autocmds("User", { pattern = "TaskModified", })
   return config.options.store.sync_tasks and sync()
+end
+
+function State.add(str, to_front)
+  if to_front then
+    table.insert(State.tasks, 1, str)
+  else
+    table.insert(State.tasks, str)
+  end
+  vim.notify(vim.inspect(State.tasks), vim.log.levels.INFO)
 end
 
 function State.done()
   table.remove(State.tasks, 1)
-  return config.options.store.sync_tasks and sync()
 end
 
 function State.set(tasks)
   State.tasks = tasks
-  return config.options.store.sync_tasks and sync()
 end
 
 return State

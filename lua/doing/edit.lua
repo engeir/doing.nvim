@@ -1,5 +1,4 @@
 local win_cfg = require("doing.config").options.edit_win_config
-local utils   = require("doing.utils")
 local state   = require("doing.state")
 
 local Edit    = {
@@ -25,7 +24,7 @@ function Edit.open_edit()
         end
 
         state.set(lines)
-        vim.defer_fn(utils.task_modified, 0)
+        vim.defer_fn(state.task_modified, 0)
       end,
     })
   end

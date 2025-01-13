@@ -5,8 +5,8 @@ local Utils = {}
 ---redraw winbar depending on if there are tasks
 function Utils.update_winbar()
   if config.options.winbar.enabled then
-    local status = require("doing").status()
-    vim.api.nvim_set_option_value("winbar", status, { scope = "local", })
+    vim.api.nvim_set_option_value("winbar", require("doing").status(),
+      { scope = "local", })
   end
 end
 
@@ -55,31 +55,6 @@ function Utils.should_display()
   -- saves result to a buffer variable
   vim.b.doing_should_display = true
   return true
-end
-
----gets called when a task is added, edited, or removed
-function Utils.task_modified()
-  Utils.update_winbar()
-  vim.api.nvim_exec_autocmds("User", {
-    pattern = "TaskModified",
-  })
-end
-
----show a message for the duration of `options.message_timeout` or timeout
----@param str string message to show
----@param timeout? number time in ms to show message
-function Utils.show_message(str, timeout)
-  if config.options.show_messages then
-    require("doing.state").message = str
-    Utils.task_modified()
-
-    vim.defer_fn(function()
-      require("doing.state").message = nil
-      Utils.task_modified()
-    end, timeout or config.options.message_timeout)
-  else
-    Utils.task_modified()
-  end
 end
 
 function Utils.os_path_separator()

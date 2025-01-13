@@ -6,7 +6,6 @@ local Utils = {}
 function Utils.update_winbar()
   if config.options.winbar.enabled then
     local status = require("doing").status()
-    vim.notify(status)
     vim.api.nvim_set_option_value("winbar", status, { scope = "local", })
   end
 end

@@ -3,26 +3,21 @@ local utils = require("doing.utils")
 
 local tasks_file = ""
 
-local function import_tasks()
-  tasks_file = vim.fn.getcwd()
-     .. utils.os_path_separator()
-     .. config.options.store.file_name
+local State = {
+  message = nil,
+  view_enabled = true,
+  tasks = {},
+}
 
-  local ok, res = pcall(vim.fn.readfile, tasks_file)
-  return ok and res or {}
-end
-
-local State = {}
-
-State.message = nil
-State.view_enabled = true
-
-State.tasks = import_tasks()
-
--- reloads tasks when directory changes
-vim.api.nvim_create_autocmd("DirChanged", {
+-- reloads tasks when directory changes and on startup
+vim.api.nvim_create_autocmd({ "DirChanged", "VimEnter", }, {
   callback = function()
-    State.tasks = import_tasks()
+    tasks_file = vim.fn.getcwd()
+       .. utils.os_path_separator()
+       .. config.options.store.file_name
+
+    local ok, res = pcall(vim.fn.readfile, tasks_file)
+    State.tasks = ok and res or {}
     utils.task_modified()
   end,
 })
@@ -51,11 +46,7 @@ if not config.options.store.sync_tasks then
 end
 
 function State.add(str, to_front)
-  if to_front then
-    table.insert(State.tasks, 1, str)
-  else
-    table.insert(State.tasks, str)
-  end
+  table.insert(State.tasks, to_front and 1 or #State.tasks, str)
   return config.options.store.sync_tasks and sync()
 end
 
@@ -66,7 +57,6 @@ end
 
 function State.set(tasks)
   State.tasks = tasks
-  vim.notify(tasks_file)
   return config.options.store.sync_tasks and sync()
 end
 

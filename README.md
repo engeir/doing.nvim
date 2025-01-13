@@ -84,7 +84,7 @@ lazy.nvim:
       message_timeout = 2000,
       doing_prefix = "Doing: ",
 
-      -- doesn"t display on buffers that match filetype/filename/filepath to
+      -- doesn't display on buffers that match filetype/filename/filepath to
       -- entries. can be either a string array or a function that returns a
       -- string array. filepath can be relative to cwd or absolute
       ignored_buffers = { "NvimTree" },

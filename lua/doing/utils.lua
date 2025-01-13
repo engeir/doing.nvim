@@ -2,14 +2,6 @@ local config = require("doing.config")
 
 local Utils = {}
 
----redraw winbar depending on if there are tasks
-function Utils.update_winbar()
-  if config.options.winbar.enabled then
-    vim.api.nvim_set_option_value("winbar", require("doing").status(),
-      { scope = "local", })
-  end
-end
-
 ---checks whether the current window/buffer should display the plugin
 function Utils.should_display()
   -- once a window gets checked once, a variable is set to tell doing

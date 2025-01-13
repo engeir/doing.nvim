@@ -1,6 +1,5 @@
 local config = require("doing.config")
 local state  = require("doing.state")
-local utils  = require("doing.utils")
 local edit   = require("doing.edit")
 
 local Doing  = {}
@@ -15,10 +14,8 @@ function Doing.setup(opts)
   if config.options.winbar.enabled then
     vim.api.nvim_create_autocmd({ "BufEnter", }, {
       callback = function()
-        -- HACK: gives time to process filetype
-        vim.defer_fn(function()
-          utils.update_winbar()
-        end, 100)
+        vim.api.nvim_set_option_value("winbar", state.status(),
+          { scope = "local", })
       end,
     })
   end

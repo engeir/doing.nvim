@@ -12,11 +12,19 @@ function Doing.setup(opts)
   -- doesn't touch the winbar if disabled so other plugins can manage
   -- it without interference
   if config.options.winbar.enabled then
+    local function update_winbar()
+      vim.defer_fn(function()
+        vim.api.nvim_set_option_value("winbar", state.status(), { scope = "local", })
+      end, 0)
+    end
+
     vim.api.nvim_create_autocmd({ "BufEnter", }, {
-      callback = function()
-        vim.api.nvim_set_option_value("winbar", state.status(),
-          { scope = "local", })
-      end,
+      callback = update_winbar,
+    })
+
+    vim.api.nvim_create_autocmd({ "User", }, {
+      pattern = "TaskModified",
+      callback = update_winbar,
     })
   end
 end

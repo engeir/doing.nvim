@@ -89,10 +89,6 @@ end
 
 ---gets called when a task is added, edited, or removed
 function State.task_modified()
-  if config.options.winbar.enabled then
-    vim.api.nvim_set_option_value("winbar", State.status(), { scope = "local", })
-  end
-
   vim.api.nvim_exec_autocmds("User", { pattern = "TaskModified", })
   return config.options.store.sync_tasks and sync()
 end

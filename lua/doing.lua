@@ -35,11 +35,11 @@ function Doing.add(task, to_front)
     end
 
     state.add(task, to_front)
-    utils.task_modified()
+    state.task_modified()
   else
     vim.ui.input({ prompt = "Enter the new task: ", }, function(input)
       state.add(input, to_front)
-      utils.task_modified()
+      state.task_modified()
     end)
   end
 end
@@ -55,44 +55,27 @@ function Doing.done()
     state.done()
 
     if #state.tasks == 0 then
-      utils.show_message("All tasks done ")
+      state.show_message("All tasks done ")
     elseif not config.options.show_remaining then
-      utils.show_message(#state.tasks .. " tasks left.")
+      state.show_message(#state.tasks .. " tasks left.")
     else
-      utils.task_modified()
+      state.task_modified()
     end
   else
-    utils.show_message("Not doing any task")
+    state.show_message("Not doing any task")
   end
 end
 
 ---@param force? boolean return status even if the plugin is toggled off
 ---@return string current current plugin task or message
 function Doing.status(force)
-  if (state.view_enabled or force) and utils.should_display() then
-    local count = #state.tasks or 0
-    if state.message then
-      return state.message
-    elseif count > 0 then
-      local tasks_left = ""
-
-      -- append task count number if there is more than 1 task
-      if config.options.show_remaining and count > 1 then
-        tasks_left = "  +" .. (count - 1) .. " more"
-      end
-
-      return config.options.doing_prefix .. state.tasks[1] .. tasks_left
-    elseif force then
-      return "Not doing any tasks"
-    end
-  end
-  return ""
+  return state.status(force)
 end
 
 ---toggle the visibility of the plugin
 function Doing.toggle()
   state.view_enabled = not state.view_enabled
-  utils.task_modified()
+  state.task_modified()
 end
 
 ---@return integer number of tasks left

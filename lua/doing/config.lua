@@ -8,6 +8,7 @@ local Config = {}
 ---@field message_timeout integer how many millisecons messages will stay on status
 ---@field winbar.enabled boolean if plugin should manage the winbar
 ---@field store.file_name string name of the task file
+---@field store.sync_tasks boolean keeps the file tasks always in sync with the loaded tasks
 ---@field edit_win_config vim.api.keyset.win_config window configs of the floating editor
 
 ---@class DoingOptions
@@ -34,6 +35,7 @@ Config.default_opts = {
 
   store = {
     file_name = ".tasks", -- name of tasks file
+    sync_tasks = false, -- keeps the file tasks always in sync with the tasks
   },
 
   -- window configs of the floating tasks editor

@@ -66,7 +66,7 @@ function Utils.task_modified()
   })
 end
 
---- show a message for the duration of `options.message_timeout` or timeout
+---show a message for the duration of `options.message_timeout` or timeout
 ---@param str string message to show
 ---@param timeout? number time in ms to show message
 function Utils.show_message(str, timeout)
@@ -83,7 +83,7 @@ function Utils.show_message(str, timeout)
   end
 end
 
-function Utils.get_path_separator()
+function Utils.os_path_separator()
   local dir_separator = "/"
   if (vim.loop or vim.uv).os_uname().sysname:find("Windows") then
     dir_separator = "\\"

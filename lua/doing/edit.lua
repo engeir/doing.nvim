@@ -1,14 +1,14 @@
 local win_cfg = require("doing.config").options.edit_win_config
-local utils = require("doing.utils")
+local utils   = require("doing.utils")
+local state   = require("doing.state")
 
-local Edit = {
+local Edit    = {
   win = nil,
   buf = nil,
 }
 
 --- open floating window to edit tasks
----@param state table current state of doing.nvim
-function Edit.open_edit(state)
+function Edit.open_edit()
   if not Edit.buf then
     Edit.buf = vim.api.nvim_create_buf(false, true)
 
@@ -25,7 +25,7 @@ function Edit.open_edit(state)
         end
 
         state.set(lines)
-        vim.defer_fn( utils.task_modified , 0)
+        vim.defer_fn(utils.task_modified, 0)
       end,
     })
   end

@@ -1,15 +1,18 @@
 local config = require("doing.config")
 local utils = require("doing.utils")
 
-local tasks_file = vim.fn.getcwd()
-   .. utils.os_path_separator()
-   .. config.options.store.file_name
-
 local State = {
   message = nil,
   view_enabled = true,
   tasks = {},
 }
+
+local tasks_file = vim.fn.getcwd()
+   .. utils.os_path_separator()
+   .. config.options.store.file_name
+
+local o, r = pcall(vim.fn.readfile, tasks_file)
+State.tasks = o and r or {}
 
 -- reloads tasks when directory changes and on startup
 vim.api.nvim_create_autocmd({ "DirChanged", "VimEnter", }, {
@@ -29,9 +32,9 @@ local function sync()
   if vim.fn.findfile(tasks_file, ".;") ~= "" and #State.tasks == 0 then
     -- if file exists and there are no tasks, delete it
     vim.schedule_wrap(function()
-      local success, err, err_name = (vim.uv or vim.loop).fs_unlink(tasks_file)
+      local ok, err, err_name = (vim.uv or vim.loop).fs_unlink(tasks_file)
 
-      if not success then
+      if not ok then
         utils.notify(tostring(err_name) .. ":" .. tostring(err),
           vim.log.levels.ERROR)
       end

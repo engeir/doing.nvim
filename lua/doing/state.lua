@@ -1,7 +1,9 @@
 local config = require("doing.config")
 local utils = require("doing.utils")
 
-local tasks_file = ""
+local tasks_file = vim.fn.getcwd()
+   .. utils.os_path_separator()
+   .. config.options.store.file_name
 
 local State = {
   message = nil,

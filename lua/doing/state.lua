@@ -7,22 +7,23 @@ local State = {
   tasks = {},
 }
 
-local tasks_file = vim.fn.getcwd()
-   .. utils.os_path_separator()
-   .. config.options.store.file_name
+local tasks_file = ""
 
-local o, r = pcall(vim.fn.readfile, tasks_file)
-State.tasks = o and r or {}
+local function load_tasks()
+  tasks_file = vim.fn.getcwd()
+     .. utils.os_path_separator()
+     .. config.options.store.file_name
+
+  local ok, res = pcall(vim.fn.readfile, tasks_file)
+  State.tasks = ok and res or {}
+end
+
+load_tasks()
 
 -- reloads tasks when directory changes and on startup
 vim.api.nvim_create_autocmd({ "DirChanged", "VimEnter", }, {
   callback = function()
-    tasks_file = vim.fn.getcwd()
-       .. utils.os_path_separator()
-       .. config.options.store.file_name
-
-    local ok, res = pcall(vim.fn.readfile, tasks_file)
-    State.tasks = ok and res or {}
+    load_tasks()
     State.task_modified()
   end,
 })

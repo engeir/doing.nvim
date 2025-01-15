@@ -8,12 +8,13 @@ local State = {
 }
 
 local tasks_file = ""
-
 local function load_tasks()
-  tasks_file = vim.fn.getcwd()
-     .. utils.os_path_separator()
-     .. config.options.store.file_name
-
+  local ok, res = pcall(vim.fn.readfile, config.options.store.file_name)
+  if ok then
+    tasks_file = config.options.store.file_name
+  else
+    tasks_file = vim.fn.getcwd() .. utils.os_path_separator() .. config.options.store.file_name
+  end
   local ok, res = pcall(vim.fn.readfile, tasks_file)
   State.tasks = ok and res or {}
 end

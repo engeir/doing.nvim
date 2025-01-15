@@ -111,8 +111,4 @@ function State.done()
   table.remove(State.tasks, 1)
 end
 
-function State.set(tasks)
-  State.tasks = tasks
-end
-
 return State

@@ -23,7 +23,7 @@ function Edit.open_edit()
           end
         end
 
-        state.set(lines)
+        state.tasks = lines
         vim.defer_fn(state.task_modified, 0)
       end,
     })

@@ -50,7 +50,7 @@ local function sync()
 end
 
 if not config.options.store.sync_tasks then
-  vim.api.nvim_create_autocmd("VimLeave", { callback = sync, })
+  vim.api.nvim_create_autocmd({ "VimLeave", "DirChangedPre", }, { callback = sync, })
 end
 
 ---@param force? boolean return status even if the plugin is toggled off
